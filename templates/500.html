@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Server Error (500) - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; text-align: center; margin-top: 50px;">
+    <div class="card" style="padding: 48px 32px; border-radius: var(--radius-xl);">
+        <div style="font-size: 5rem; font-weight: 800; color: var(--warning); line-height: 1; margin-bottom: 12px;">500</div>
+        <h2 style="font-size: 1.8rem; margin-bottom: 12px; color: var(--dark-navy);">Internal Server Error</h2>
+        <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 28px;">
+            The placement portal encountered an unexpected internal issue. Please try refreshing or return to the home page.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 12px;">
+            <a href="{% url 'home' %}" class="btn btn-primary">
+                <i class="fa-solid fa-house"></i> Return Home
+            </a>
+            <a href="{% url 'contact' %}" class="btn btn-secondary">
+                <i class="fa-solid fa-envelope"></i> Contact Support
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

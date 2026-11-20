@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Placement Office - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container" style="max-width: 920px;">
+    <!-- Minimalist Corporate Header -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-building-columns" style="color: var(--primary);"></i> Corporate Relations & Placement Directorate
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    Contact Placement Cell
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 620px;">
+                    Assisting enrolled students, visiting corporate recruiters, and alumni with campus recruitment, corporate tie-ups, and placement logistics.
+                </p>
+            </div>
+            <div style="display: flex; gap: 8px; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
+                <span><i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i> Admin Block, Level 3</span>
+                <span>&bull;</span>
+                <span><i class="fa-solid fa-phone" style="margin-right: 4px;"></i> +91 (080) 2854-9900</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px;">
+        <!-- Contact Information Card with Officer Profile -->
+        <div class="card" style="padding: 22px; border: 1px solid var(--card-border);">
+            <!-- Officer Card Box -->
+            <div style="display: flex; align-items: center; gap: 14px; padding: 12px; background: var(--surface-well); border-radius: var(--radius-xs); border: 1px solid var(--card-border); margin-bottom: 18px;">
+                <div style="width: 48px; height: 48px; border-radius: var(--radius-xs); overflow: hidden; border: 1px solid var(--card-border); flex-shrink: 0;">
+                    <img src="{% static 'images/officer_portrait.jpg' %}" alt="Dr. Anita Sharma" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div>
+                    <h5 style="margin: 0; font-size: 0.92rem; color: var(--dark-navy); font-weight: 700;">Dr. Anita Sharma</h5>
+                    <div style="font-size: 0.78rem; color: var(--primary); font-weight: 600;">Dean & Head of Corporate Relations</div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Office of Placement Excellence</div>
+                </div>
+            </div>
+
+            <h4 style="font-size: 1rem; margin-bottom: 14px; color: var(--dark-navy); font-weight: 700;">Office Coordinates</h4>
+
+            <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.88rem;">
+                <div style="display: flex; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--surface-well); border: 1px solid var(--card-border); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--dark-navy); font-size: 0.85rem;">Office Location:</strong>
+                        <p style="color: var(--text-muted); margin: 2px 0 0; font-size: 0.82rem;">Corporate Relations Wing, Administrative Block, 3rd Floor</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--surface-well); border: 1px solid var(--card-border); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--dark-navy); font-size: 0.85rem;">Official Email:</strong>
+                        <p style="color: var(--text-muted); margin: 2px 0 0; font-size: 0.82rem;">placements@college.edu</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--surface-well); border: 1px solid var(--card-border); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--dark-navy); font-size: 0.85rem;">Helpline:</strong>
+                        <p style="color: var(--text-muted); margin: 2px 0 0; font-size: 0.82rem;">+91 (080) 2854-9900 / 9901</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <div style="width: 32px; height: 32px; border-radius: var(--radius-xs); background: var(--surface-well); border: 1px solid var(--card-border); color: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--dark-navy); font-size: 0.85rem;">Operating Hours:</strong>
+                        <p style="color: var(--text-muted); margin: 2px 0 0; font-size: 0.82rem;">Monday &ndash; Friday: 9:00 AM &ndash; 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="card" style="padding: 22px; border: 1px solid var(--card-border);">
+            <h4 style="font-size: 1rem; margin-bottom: 16px; color: var(--dark-navy); font-weight: 700;">Direct Inquiry Form</h4>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" name="name" class="form-control" placeholder="Your Full Name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" name="email" class="form-control" placeholder="you@college.edu" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Roll / USN Number</label>
+                        <input type="text" name="roll" class="form-control" placeholder="e.g. 21CS045">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject *</label>
+                    <input type="text" name="subject" class="form-control" placeholder="Inquiry regarding drive or eligibility..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message Content *</label>
+                    <textarea name="message" class="form-control" rows="4" placeholder="How can the corporate placement cell assist you?" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; padding: 10px;">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Inquiry
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

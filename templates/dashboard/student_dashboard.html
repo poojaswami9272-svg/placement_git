@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Placement Dashboard - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Welcome Header with Student Portrait -->
+    <div class="card" style="margin-bottom: 20px; padding: 20px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                <div style="width: 56px; height: 56px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); overflow: hidden; background: var(--surface-well); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--dark-navy); font-weight: 700; flex-shrink: 0;">
+                    {% if profile.profile_photo %}
+                        <img src="{{ profile.profile_photo.url }}" alt="{{ profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% elif 'priya' in profile.user.username|lower or 'sneha' in profile.user.username|lower %}
+                        <img src="{% static 'images/student_female.jpg' %}" alt="{{ profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'images/student_male.jpg' %}" alt="{{ profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% endif %}
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 3px; flex-wrap: wrap;">
+                        <h2 style="font-size: 1.45rem; margin: 0; font-weight: 700; color: var(--dark-navy);">Welcome, {{ profile.full_name }}</h2>
+                        <span class="badge {% if profile.placement_status == 'PLACED' %}badge-success{% else %}badge-primary{% endif %}">
+                            {{ profile.get_placement_status_display }}
+                        </span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                        <i class="fa-solid fa-id-badge" style="color: var(--primary); margin-right: 4px;"></i> <strong>{{ profile.roll_number }}</strong> &bull; 
+                        {{ profile.get_department_display }} &bull; Year {{ profile.current_year }} &bull; CGPA: <strong>{{ profile.cgpa }}</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a href="{% url 'drive_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-briefcase"></i> Browse Drives
+                </a>
+                <a href="{% url 'ai_assistant' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Career Assistant
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Metrics Strip -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px;">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-file-signature"></i></div>
+            <div class="stat-info">
+                <h3>{{ total_apps }}</h3>
+                <p>Applied Drives</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-clipboard-check"></i></div>
+            <div class="stat-info">
+                <h3>{{ shortlisted_count }}</h3>
+                <p>Shortlisted</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amber"><i class="fa-solid fa-user-clock"></i></div>
+            <div class="stat-info">
+                <h3>{{ interview_count }}</h3>
+                <p>Interviews Scheduled</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-trophy"></i></div>
+            <div class="stat-info">
+                <h3>{{ selected_count }}</h3>
+                <p>Offers Received</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid: Left (Recommended Jobs & Applications), Right (Profile Meter, Interviews, Alerts) -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+        
+        <!-- Left Side: AI Recommendations & Recent Applications -->
+        <div>
+            <!-- AI Recommended For You Section -->
+            <div class="card" style="margin-bottom: 24px; border: 1px solid var(--card-border);">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-purple);"></i>
+                        <h4 style="font-size: 1.05rem; margin: 0; font-weight: 700; color: var(--dark-navy);">Recommended For Your Profile</h4>
+                    </div>
+                    <span style="font-size: 0.78rem; color: var(--text-muted);">AI Matched</span>
+                </div>
+
+                <div class="card-body">
+                    {% if recommended_jobs %}
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;">
+                            {% for rec in recommended_jobs %}
+                                <div style="background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px;">
+                                            <div class="company-logo-avatar" style="width: 36px; height: 36px; flex-shrink: 0; font-size: 0.85rem;">
+                                                {% if rec.drive.company.logo %}
+                                                    <img src="{{ rec.drive.company.logo.url }}" alt="{{ rec.drive.company.name }}">
+                                                {% else %}
+                                                    {{ rec.drive.company.name|make_list|first|upper }}
+                                                {% endif %}
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 4px;">
+                                                    <h5 style="margin: 0; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600;">
+                                                        <a href="{% url 'drive_detail' rec.drive.id %}" style="color: var(--dark-navy);">{{ rec.drive.title }}</a>
+                                                    </h5>
+                                                    <span class="badge badge-purple" style="font-size: 0.7rem; padding: 1px 5px; flex-shrink: 0;">{{ rec.match_score }}% Match</span>
+                                                </div>
+                                                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                                                    {{ rec.drive.company.name }} &bull; ₹{{ rec.drive.salary_package }} LPA &bull; Exp: {{ rec.drive.get_experience_required_display }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="job-skills-wrap" style="margin-bottom: 10px;">
+                                            {% for s in rec.drive.skills_list|slice:":3" %}
+                                                <span class="skill-tag" style="font-size: 0.7rem; padding: 1px 6px;">{{ s }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 8px;">
+                                        <span style="font-size: 0.75rem; color: {% if rec.is_eligible %}var(--success){% else %}var(--danger){% endif %}; font-weight: 600;">
+                                            {% if rec.is_eligible %}&#10003; Eligible{% else %}&#10007; Review Criteria{% endif %}
+                                        </span>
+                                        <a href="{% url 'drive_detail' rec.drive.id %}" class="btn btn-primary btn-sm" style="padding: 3px 8px; font-size: 0.75rem;">
+                                            Apply &rarr;
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin: 0;">
+                            No new unapplied recommendations at this moment. You are caught up with current campus drives!
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Applications Table -->
+            <div class="card" style="margin-bottom: 24px; border: 1px solid var(--card-border);">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="font-size: 1.05rem; margin: 0; font-weight: 700; color: var(--dark-navy);">Recent Applications</h4>
+                    <a href="{% url 'my_applications' %}" class="btn btn-secondary btn-sm" style="font-size: 0.78rem;">View All ({{ total_apps }})</a>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-responsive" style="border: none;">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Role & Company</th>
+                                    <th>Package</th>
+                                    <th>Applied On</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in recent_applications %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'drive_detail' app.job.id %}" style="font-weight: 600; color: var(--dark-navy);">
+                                                {{ app.job.title }}
+                                            </a>
+                                            <div style="font-size: 0.78rem; color: var(--text-muted);">{{ app.job.company.name }}</div>
+                                        </td>
+                                        <td style="font-feature-settings: 'tnum';">₹{{ app.job.salary_package }} LPA</td>
+                                        <td style="font-size: 0.82rem; color: var(--text-muted);">{{ app.applied_date|date:"M d, Y" }}</td>
+                                        <td><span class="badge {{ app.status_badge_class }}">{{ app.get_status_display }}</span></td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                                            No placement drive applications recorded yet. <a href="{% url 'drive_list' %}">Explore active drives</a>.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Profile Completion, Interviews, Notifications -->
+        <div>
+            <!-- Profile Completion Meter Card -->
+            <div class="card" style="margin-bottom: 20px; padding: 20px; border: 1px solid var(--card-border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="font-size: 0.95rem; margin: 0; font-weight: 700; color: var(--dark-navy);">Profile Readiness</h4>
+                    <span style="font-size: 1.15rem; font-weight: 800; color: var(--primary); font-feature-settings: 'tnum';">{{ completion_percentage }}%</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 12px;">A complete student profile increases recruiter shortlist probability.</p>
+                <div class="progress-bar-container" style="height: 6px; margin-bottom: 14px;">
+                    <div class="progress-bar-fill {% if completion_percentage >= 80 %}success{% endif %}" style="width: {{ completion_percentage }}%;"></div>
+                </div>
+                <a href="{% url 'student_profile' %}" class="btn btn-secondary btn-sm" style="width: 100%;">
+                    Update Profile &rarr;
+                </a>
+            </div>
+
+            <!-- Upcoming Interviews Card -->
+            <div class="card" style="padding: 20px; margin-bottom: 20px; border: 1px solid var(--card-border);">
+                <h4 style="font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--dark-navy);">
+                    <i class="fa-solid fa-calendar-check" style="color: var(--warning);"></i> Scheduled Interviews
+                </h4>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    {% for iv in upcoming_interviews %}
+                        <div style="padding: 10px 12px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs);">
+                            <div style="font-weight: 600; font-size: 0.85rem; color: var(--dark-navy);">
+                                {{ iv.get_interview_type_display }}
+                            </div>
+                            <div style="font-size: 0.78rem; color: var(--text-main); margin: 2px 0;">
+                                {{ iv.application.job.company.name }} &bull; {{ iv.application.job.title }}
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                <i class="fa-solid fa-clock"></i> {{ iv.interview_date|date:"M d" }} at {{ iv.interview_time|time:"g:i A" }}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;">No active interview rounds scheduled.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recent Notifications -->
+            <div class="card" style="padding: 20px; border: 1px solid var(--card-border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="font-size: 0.95rem; margin: 0; font-weight: 700; color: var(--dark-navy);">
+                        <i class="fa-solid fa-bell" style="color: var(--primary); margin-right: 4px;"></i> Alerts
+                    </h4>
+                    <a href="{% url 'notifications' %}" style="font-size: 0.78rem; color: var(--primary);">View All</a>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% for n in recent_notifications %}
+                        <div style="font-size: 0.82rem; border-bottom: 1px solid var(--card-border); padding-bottom: 6px;">
+                            <div style="font-weight: 600; color: var(--dark-navy);">{{ n.title }}</div>
+                            <span style="font-size: 0.74rem; color: var(--text-muted);">{{ n.created_at|timesince }} ago</span>
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;">No new alerts.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

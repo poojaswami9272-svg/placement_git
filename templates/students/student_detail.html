@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.full_name }} - Placement Dossier{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'student_list' %}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Back to Students
+            </a>
+            <h2 style="font-size: 1.85rem; margin: 0;">{{ student.full_name }}</h2>
+            <span class="badge {% if student.placement_status == 'PLACED' %}badge-success{% else %}badge-secondary{% endif %}">
+                {{ student.get_placement_status_display }}
+            </span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            {% if student.resume_file %}
+                <a href="{{ student.resume_file.url }}" target="_blank" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-file-pdf"></i> View Resume
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Overview Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+        <!-- Left Side Profile Info -->
+        <div>
+            <div class="card" style="padding: 24px; margin-bottom: 24px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div class="avatar-circle" style="width: 80px; height: 80px; margin: 0 auto 12px; font-size: 2rem;">
+                        {% if student.profile_photo %}
+                            <img src="{{ student.profile_photo.url }}" alt="{{ student.full_name }}">
+                        {% else %}
+                            {{ student.full_name|make_list|first|upper }}
+                        {% endif %}
+                    </div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 4px;">{{ student.full_name }}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Roll No: <strong>{{ student.roll_number }}</strong></p>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; border-top: 1px solid var(--card-border); padding-top: 16px;">
+                    <div><span style="color: var(--text-muted);">Department:</span> <strong>{{ student.get_department_display }}</strong></div>
+                    <div><span style="color: var(--text-muted);">Academic Year:</span> <strong>{{ student.get_current_year_display }}</strong></div>
+                    <div><span style="color: var(--text-muted);">CGPA:</span> <strong style="color: var(--primary);">{{ student.cgpa }}</strong></div>
+                    <div><span style="color: var(--text-muted);">Backlogs:</span> <strong>{{ student.active_backlogs }}</strong></div>
+                    <div><span style="color: var(--text-muted);">10th / 12th:</span> <strong>{{ student.tenth_percentage }}% / {{ student.twelfth_percentage }}%</strong></div>
+                    <div><span style="color: var(--text-muted);">Email:</span> {{ student.user.email }}</div>
+                    <div><span style="color: var(--text-muted);">Phone:</span> {{ student.user.phone_number|default:'N/A' }}</div>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="card" style="padding: 24px; margin-bottom: 24px;">
+                <h4 style="font-size: 1.05rem; margin-bottom: 12px;"><i class="fa-solid fa-bolt" style="color: var(--warning);"></i> Skills</h4>
+                <div class="job-skills-wrap" style="margin-bottom: 0;">
+                    {% for s in student.skills_list %}
+                        <span class="skill-tag">{{ s }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side Applications & History -->
+        <div>
+            <!-- Placement Applications Table -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-briefcase" style="color: var(--primary);"></i> Placement Drive Applications ({{ applications.count }})</h4>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Company & Job</th>
+                                    <th>Package</th>
+                                    <th>Applied On</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in applications %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ app.job.title }}</strong>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);">{{ app.job.company.name }}</div>
+                                        </td>
+                                        <td>{{ app.job.salary_package }} LPA</td>
+                                        <td style="font-size: 0.85rem; color: var(--text-muted);">{{ app.applied_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <span class="badge {{ app.status_badge_class }}">{{ app.get_status_display }}</span>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">No applications submitted yet.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-code" style="color: var(--secondary);"></i> Projects</h4>
+                </div>
+                <div class="card-body">
+                    {% for p in projects %}
+                        <div style="margin-bottom: 14px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px;">
+                            <h5 style="margin-bottom: 2px;">{{ p.title }}</h5>
+                            <span style="font-size: 0.8rem; color: var(--primary);">{{ p.technologies }}</span>
+                            <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">{{ p.description }}</p>
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">No projects documented.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-folder" style="color: var(--accent-purple);"></i> Verified Documents</h4>
+                </div>
+                <div class="card-body">
+                    {% for doc in documents %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--card-border);">
+                            <span><i class="fa-solid fa-file-check"></i> {{ doc.get_doc_type_display }}</span>
+                            <a href="{{ doc.document_file.url }}" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 10px;">View</a>
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">No documents uploaded.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

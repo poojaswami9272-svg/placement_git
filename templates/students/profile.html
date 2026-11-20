@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile.full_name }} - Student Profile{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Top Profile Header Card -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; background: var(--card-bg); border-radius: var(--radius-md); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px;">
+            <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
+                <div style="width: 68px; height: 68px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); overflow: hidden; background: var(--surface-well); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--dark-navy); font-weight: 700; flex-shrink: 0;">
+                    {% if profile.profile_photo %}
+                        <img src="{{ profile.profile_photo.url }}" alt="{{ profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% elif 'priya' in profile.user.username|lower or 'sneha' in profile.user.username|lower %}
+                        <img src="{% static 'images/student_female.jpg' %}" alt="{{ profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'images/student_male.jpg' %}" alt="{{ profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% endif %}
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+                        <h2 style="font-size: 1.55rem; margin: 0; font-weight: 700; color: var(--dark-navy);">{{ profile.full_name }}</h2>
+                        <span class="badge badge-{% if profile.placement_status == 'PLACED' %}success{% elif profile.placement_status == 'SELECTED' %}purple{% elif profile.placement_status == 'APPLIED' %}primary{% else %}secondary{% endif %}" style="font-size: 0.78rem;">
+                            <i class="fa-solid fa-circle-dot" style="font-size: 0.55rem;"></i> {{ profile.get_placement_status_display }}
+                        </span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;">
+                        <i class="fa-solid fa-id-badge" style="color: var(--primary);"></i> <strong>{{ profile.roll_number }}</strong> &bull; 
+                        <i class="fa-solid fa-building-columns"></i> {{ profile.get_department_display }} &bull; 
+                        <i class="fa-solid fa-graduation-cap"></i> {{ profile.get_current_year_display }}
+                    </p>
+                    <div style="display: flex; gap: 16px; font-size: 0.88rem; color: var(--text-muted); flex-wrap: wrap;">
+                        <span><i class="fa-solid fa-envelope"></i> {{ profile.user.email }}</span>
+                        <span><i class="fa-solid fa-phone"></i> {{ profile.user.phone_number|default:'Not provided' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="{% url 'edit_student_profile' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+                </a>
+                <a href="{% url 'my_resume' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-file-pdf"></i> Manage Resume
+                </a>
+                <a href="{% url 'documents' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-folder-open"></i> Documents
+                </a>
+            </div>
+        </div>
+
+        <!-- Profile Completion Card / Visual Meter -->
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--card-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-weight: 700; font-size: 0.92rem; color: var(--dark-navy);">
+                    <i class="fa-solid fa-chart-pie" style="color: var(--primary);"></i> Profile Completion Status
+                </span>
+                <span style="font-weight: 800; font-size: 1rem; color: var(--primary);">
+                    {{ completion_percentage }}% Completed
+                </span>
+            </div>
+            <div class="progress-bar-container" style="height: 12px;">
+                <div class="progress-bar-fill {% if completion_percentage >= 80 %}success{% elif completion_percentage >= 50 %}warning{% endif %}" style="width: {{ completion_percentage }}%;"></div>
+            </div>
+            {% if completion_percentage < 100 %}
+                <small style="color: var(--text-muted); margin-top: 6px; display: block; font-size: 0.8rem;">
+                    <i class="fa-solid fa-circle-info"></i> Tip: Upload your resume, projects, and certifications to increase visibility for top campus recruiters!
+                </small>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Grid Content -->
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+        
+        <!-- Left Sidebar: Academics & Skills -->
+        <div>
+            <!-- Academic Card -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-award" style="color: var(--primary);"></i> Academic Summary</h4>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+                            <span style="color: var(--text-muted);">Current CGPA</span>
+                            <strong style="color: var(--primary); font-size: 1.1rem;">{{ profile.cgpa }} / 10.0</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+                            <span style="color: var(--text-muted);">Active Backlogs</span>
+                            <span class="badge {% if profile.active_backlogs == 0 %}badge-success{% else %}badge-danger{% endif %}">
+                                {{ profile.active_backlogs }} Backlogs
+                            </span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+                            <span style="color: var(--text-muted);">10th Percentage</span>
+                            <strong>{{ profile.tenth_percentage|default:'N/A' }}%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted);">12th / Diploma</span>
+                            <strong>{{ profile.twelfth_percentage|default:'N/A' }}%</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Card -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> Skills & Competencies</h4>
+                </div>
+                <div class="card-body">
+                    <div class="job-skills-wrap" style="margin-bottom: 0;">
+                        {% for skill in profile.skills_list %}
+                            <span class="skill-tag" style="background: var(--primary-light); color: var(--primary); font-size: 0.85rem; padding: 6px 12px;">
+                                {{ skill }}
+                            </span>
+                        {% empty %}
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">No skills specified yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Career Interests Card -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-bullseye" style="color: var(--secondary);"></i> Target Career Interests</h4>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6;">
+                        {{ profile.career_interests|default:'Software Development, Full-Stack Engineering, Data Analytics' }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Social Links Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-link" style="color: var(--accent-purple);"></i> Profiles & Portfolios</h4>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.92rem;">
+                        {% if profile.linkedin_url %}
+                            <a href="{{ profile.linkedin_url }}" target="_blank" style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-brands fa-linkedin" style="color: #0077b5; font-size: 1.2rem;"></i> LinkedIn Profile
+                            </a>
+                        {% endif %}
+                        {% if profile.github_url %}
+                            <a href="{{ profile.github_url }}" target="_blank" style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-brands fa-github" style="color: #333; font-size: 1.2rem;"></i> GitHub Profile
+                            </a>
+                        {% endif %}
+                        {% if profile.portfolio_url %}
+                            <a href="{{ profile.portfolio_url }}" target="_blank" style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-globe" style="color: var(--secondary); font-size: 1.2rem;"></i> Personal Portfolio
+                            </a>
+                        {% endif %}
+                        {% if not profile.linkedin_url and not profile.github_url and not profile.portfolio_url %}
+                            <p style="color: var(--text-muted); font-size: 0.88rem;">No external profiles linked yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content: Bio, Projects, Certifications, Resume Status -->
+        <div>
+            <!-- About Me Bio Card -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> About Me</h4>
+                </div>
+                <div class="card-body">
+                    <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.7;">
+                        {{ profile.bio|default:'Passionate engineering student enthusiastic about leveraging technology to solve meaningful real-world challenges.' }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Resume Quick Banner -->
+            <div class="card" style="margin-bottom: 24px; padding: 20px 24px; background: var(--surface-highlight); border-left: 4px solid var(--primary);">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; color: var(--dark-navy);">Placement Resume Status</div>
+                            <div style="font-size: 0.88rem; color: var(--text-muted);">
+                                Status: <strong style="color: {% if profile.resume_status == 'Uploaded' or profile.resume_status == 'Updated' %}var(--success){% else %}var(--danger){% endif %};">{{ profile.resume_status }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        {% if profile.resume_file %}
+                            <a href="{{ profile.resume_file.url }}" target="_blank" class="btn btn-secondary btn-sm">
+                                <i class="fa-solid fa-eye"></i> View Current
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'my_resume' %}" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-upload"></i> Update Resume
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-laptop-code" style="color: var(--primary);"></i> Projects & Work</h4>
+                    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('addProjectModal').style.display='block';">
+                        <i class="fa-solid fa-plus"></i> Add Project
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% for project in projects %}
+                        <div style="padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--card-border); position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h5 style="font-size: 1.05rem; margin-bottom: 4px; color: var(--dark-navy);">{{ project.title }}</h5>
+                                <a href="{% url 'delete_project' project.id %}" onclick="return confirm('Remove project?')" style="color: var(--danger); font-size: 0.85rem;" title="Delete Project">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                            <div style="font-size: 0.82rem; color: var(--primary); font-weight: 600; margin-bottom: 8px;">
+                                <i class="fa-solid fa-code"></i> {{ project.technologies }}
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">{{ project.description }}</p>
+                            <div style="display: flex; gap: 12px; font-size: 0.85rem;">
+                                {% if project.project_url %}
+                                    <a href="{{ project.project_url }}" target="_blank"><i class="fa-solid fa-up-right-from-square"></i> Live Demo</a>
+                                {% endif %}
+                                {% if project.github_url %}
+                                    <a href="{{ project.github_url }}" target="_blank"><i class="fa-brands fa-github"></i> Repository</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.92rem; text-align: center; padding: 20px 0;">
+                            No projects added yet. Click "+ Add Project" to highlight your work!
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Certifications Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-certificate" style="color: #10b981;"></i> Certifications & Credentials</h4>
+                    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('addCertModal').style.display='block';">
+                        <i class="fa-solid fa-plus"></i> Add Certification
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% for cert in certifications %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--card-border);">
+                            <div>
+                                <div style="font-weight: 700; color: var(--dark-navy); font-size: 0.95rem;">{{ cert.title }}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                                    Issued by <strong>{{ cert.issuing_organization }}</strong> {% if cert.issue_date %}&bull; {{ cert.issue_date }}{% endif %}
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                {% if cert.credential_url %}
+                                    <a href="{{ cert.credential_url }}" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 0.8rem;">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Verify
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'delete_certification' cert.id %}" onclick="return confirm('Remove certification?')" style="color: var(--danger); font-size: 0.85rem;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.92rem; text-align: center; padding: 20px 0;">
+                            No certifications added yet. Click "+ Add Certification" to add your achievements!
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal: Add Project -->
+<div id="addProjectModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; overflow-y: auto; padding: 40px 16px;">
+    <div class="card" style="max-width: 540px; margin: 40px auto; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 1.3rem;">Add Project</h3>
+            <button onclick="document.getElementById('addProjectModal').style.display='none';" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+        <form method="post" action="{% url 'add_project' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Project Title *</label>
+                <input type="text" name="title" class="form-control" placeholder="e.g. AI Resume Parser" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Technologies Used *</label>
+                <input type="text" name="technologies" class="form-control" placeholder="e.g. Python, Django, SQLite, CSS" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description *</label>
+                <textarea name="description" class="form-control" rows="3" placeholder="Briefly explain what problem this project solved..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Project / Demo URL (Optional)</label>
+                <input type="url" name="project_url" class="form-control" placeholder="https://...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">GitHub Repository URL (Optional)</label>
+                <input type="url" name="github_url" class="form-control" placeholder="https://github.com/...">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('addProjectModal').style.display='none';">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add Certification -->
+<div id="addCertModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; overflow-y: auto; padding: 40px 16px;">
+    <div class="card" style="max-width: 540px; margin: 40px auto; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 1.3rem;">Add Certification</h3>
+            <button onclick="document.getElementById('addCertModal').style.display='none';" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+        <form method="post" action="{% url 'add_certification' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Certification Title *</label>
+                <input type="text" name="title" class="form-control" placeholder="e.g. AWS Certified Cloud Practitioner" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Issuing Organization *</label>
+                <input type="text" name="issuing_organization" class="form-control" placeholder="e.g. Amazon Web Services, Coursera, Meta" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Issue Date</label>
+                <input type="date" name="issue_date" class="form-control">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Credential Verification URL (Optional)</label>
+                <input type="url" name="credential_url" class="form-control" placeholder="https://...">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('addCertModal').style.display='none';">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Certification</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Registration - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 720px; margin-top: 24px;">
+    <div class="card" style="padding: 32px 30px; box-shadow: var(--shadow-sm); border: 1px solid var(--card-border); border-radius: var(--radius-md);">
+        <div style="text-align: center; margin-bottom: 26px;">
+            <div style="width: 44px; height: 44px; margin: 0 auto 12px; border-radius: var(--radius-sm); background: var(--surface-well); border: 1px solid var(--card-border); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <h2 style="font-size: 1.65rem; font-weight: 700; margin-bottom: 6px; color: var(--dark-navy);">Student Profile Registration</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Create your campus placement credentials to discover drives, verify cutoffs, and apply.</p>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" style="margin-bottom: 18px; padding: 10px 14px; font-size: 0.85rem;">
+                    {% for error in form.non_field_errors %}{{ error }}<br>{% endfor %}
+                </div>
+            {% endif %}
+
+            <h4 style="font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dark-navy); margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--card-border); font-weight: 700;">
+                <i class="fa-solid fa-user-circle" style="color: var(--primary); margin-right: 6px;"></i> Account Credentials
+            </h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name *</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.first_name.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name *</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.last_name.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.username.id_for_label }}">Username *</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.username.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">Official College Email *</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.email.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.phone_number.id_for_label }}">Phone Number *</label>
+                    {{ form.phone_number }}
+                    {% if form.phone_number.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.phone_number.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.roll_number.id_for_label }}">College Roll / USN Number *</label>
+                    {{ form.roll_number }}
+                    {% if form.roll_number.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.roll_number.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <h4 style="font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dark-navy); margin: 20px 0 14px; padding-bottom: 6px; border-bottom: 1px solid var(--card-border); font-weight: 700;">
+                <i class="fa-solid fa-graduation-cap" style="color: var(--primary); margin-right: 6px;"></i> Academic & Placement Info
+            </h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.department.id_for_label }}">Department / Branch *</label>
+                    {{ form.department }}
+                    {% if form.department.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.department.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.current_year.id_for_label }}">Current Academic Year *</label>
+                    {{ form.current_year }}
+                    {% if form.current_year.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.current_year.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.cgpa.id_for_label }}">Current CGPA (out of 10) *</label>
+                    {{ form.cgpa }}
+                    {% if form.cgpa.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.cgpa.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.skills.id_for_label }}">Technical & Professional Skills (comma-separated) *</label>
+                {{ form.skills }}
+                <small style="color: var(--text-muted); font-size: 0.78rem; display: block; margin-top: 4px;">Example: Python, Django, PostgreSQL, HTML5, Docker, Git</small>
+                {% if form.skills.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.skills.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.career_interests.id_for_label }}">Target Career Roles & Interests</label>
+                {{ form.career_interests }}
+                {% if form.career_interests.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.career_interests.errors.0 }}</span>{% endif %}
+            </div>
+
+            <h4 style="font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dark-navy); margin: 20px 0 14px; padding-bottom: 6px; border-bottom: 1px solid var(--card-border); font-weight: 700;">
+                <i class="fa-solid fa-shield-halved" style="color: var(--primary); margin-right: 6px;"></i> Security Credentials
+            </h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.password.id_for_label }}">Password *</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.password.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.confirm_password.id_for_label }}">Confirm Password *</label>
+                    {{ form.confirm_password }}
+                    {% if form.confirm_password.errors %}<span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.confirm_password.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 12px; padding: 11px; font-size: 0.95rem;">
+                <i class="fa-solid fa-user-check"></i> Register Student Account
+            </button>
+        </form>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--card-border); text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+            Already registered? 
+            <a href="{% url 'login' %}" style="font-weight: 600; color: var(--primary);">Sign In here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

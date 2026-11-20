@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}My Documents - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <h2 style="font-size: 1.85rem; margin-bottom: 4px;">Placement Document Repository</h2>
+            <p style="color: var(--text-muted);">Upload marksheets, college ID, and certificates for verification by the placement cell.</p>
+        </div>
+        <a href="{% url 'student_profile' %}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Back to Profile
+        </a>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="card" style="padding: 28px; margin-bottom: 30px;">
+        <h4 style="font-size: 1.15rem; margin-bottom: 16px;">
+            <i class="fa-solid fa-cloud-arrow-up" style="color: var(--primary);"></i> Upload New Verification Document
+        </h4>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Document Type *</label>
+                    {{ form.doc_type }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Select File (PDF / Images) *</label>
+                    {{ form.document_file }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                <i class="fa-solid fa-upload"></i> Upload Document
+            </button>
+        </form>
+    </div>
+
+    <!-- Documents List -->
+    <div class="card">
+        <div class="card-header">
+            <h4 style="font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-folder-tree" style="color: var(--primary);"></i> Uploaded Documents ({{ documents.count }})</h4>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Document Type</th>
+                            <th>Date Uploaded</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in documents %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                                            <i class="fa-solid fa-file-shield"></i>
+                                        </div>
+                                        <span style="font-weight: 600;">{{ doc.get_doc_type_display }}</span>
+                                    </div>
+                                </td>
+                                <td style="color: var(--text-muted); font-size: 0.88rem;">{{ doc.uploaded_at|date:"M d, Y, h:i A" }}</td>
+                                <td>
+                                    <a href="{{ doc.document_file.url }}" target="_blank" class="btn btn-secondary btn-sm">
+                                        <i class="fa-solid fa-eye"></i> View File
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                    No verification documents uploaded yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

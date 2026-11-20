@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI College Placement Management System - Enterprise Campus Recruitment Portal{% endblock %}
+
+{% block content %}
+<!-- ===================================================================
+     Minimalist Corporate Hero Section
+     =================================================================== -->
+<section class="hero-section" style="margin-top: -24px; padding: 50px 0 54px; background: var(--card-bg); border-bottom: 1px solid var(--card-border);">
+    <div class="container">
+        <div class="hero-grid" style="align-items: center;">
+            <div>
+                <div class="hero-badge">
+                    <i class="fa-solid fa-graduation-cap" style="color: var(--primary);"></i> Campus Recruitment Season 2025–26
+                </div>
+                <h1 class="hero-title">
+                    Accelerate Your Career. <br>
+                    <span class="gradient-text">Discover Top Campus Opportunities.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Discover campus placement drives from premier enterprises, verify eligibility cutoffs instantly, and prepare with the AI career intelligence suite.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="{% url 'drive_list' %}" class="btn btn-primary btn-lg">
+                        <i class="fa-solid fa-briefcase"></i> Explore Active Drives
+                    </a>
+                    {% if not user.is_authenticated %}
+                        <a href="{% url 'register' %}" class="btn btn-secondary btn-lg">
+                            <i class="fa-solid fa-user-plus"></i> Student Registration
+                        </a>
+                    {% else %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg">
+                            <i class="fa-solid fa-gauge-high"></i> Open Dashboard
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'ai_assistant' %}" class="btn btn-ai btn-lg">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Career Assistant
+                    </a>
+                </div>
+
+                <div class="hero-features">
+                    <div class="hero-feature-item">
+                        <i class="fa-solid fa-circle-check"></i> Automated Eligibility Verification
+                    </div>
+                    <div class="hero-feature-item">
+                        <i class="fa-solid fa-circle-check"></i> ATS Keyword Screening
+                    </div>
+                    <div class="hero-feature-item">
+                        <i class="fa-solid fa-circle-check"></i> Direct Application Pipeline
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Visual Card with Minimalist Badges -->
+            <div style="position: relative;">
+                <div class="hero-card-visual" style="border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm); border-radius: var(--radius-md); overflow: hidden;">
+                    <img src="{% static 'images/hero_students.jpg' %}" alt="Students celebrating campus placement success" style="width: 100%; height: 340px; object-fit: cover;">
+                    
+                    <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border-top: 1px solid var(--card-border);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="avatar-circle" style="width: 38px; height: 38px;">
+                                <img src="{% static 'images/student_female.jpg' %}" alt="Student Priya">
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.9rem; margin: 0; color: var(--dark-navy); font-weight: 700;">Priya Patel &bull; IT Track</h4>
+                                <span style="font-size: 0.78rem; color: var(--success); font-weight: 600;">Placed at Deloitte &bull; ₹8.8 LPA</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Campus Placement</span>
+                            <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary); font-feature-settings: 'tnum';">{{ placement_rate }}% Placed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subtle Clean Floating Badges -->
+                <div class="floating-pill pill-1">
+                    <div style="width: 24px; height: 24px; border-radius: var(--radius-xs); background: var(--success-light); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--dark-navy); font-size: 0.8rem;">Microsoft India</strong>
+                        <div style="font-size: 0.74rem; color: var(--success); font-weight: 600;">₹18.0 LPA Selected</div>
+                    </div>
+                </div>
+
+                <div class="floating-pill pill-2">
+                    <div style="width: 24px; height: 24px; border-radius: var(--radius-xs); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <strong style="color: var(--dark-navy); font-size: 0.8rem;">ATS Benchmark</strong>
+                        <div style="font-size: 0.74rem; color: var(--primary); font-weight: 600;">94/100 ATS Match</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     Placement Key Statistics Strip
+     =================================================================== -->
+<section style="padding: 36px 0; background: var(--surface-highlight); border-bottom: 1px solid var(--card-border);">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa-solid fa-user-graduate"></i></div>
+                <div class="stat-info">
+                    <h3>{{ total_students }}+</h3>
+                    <p>Enrolled Candidates</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-building"></i></div>
+                <div class="stat-info">
+                    <h3>{{ total_companies }}+</h3>
+                    <p>Recruiting Partners</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fa-solid fa-trophy"></i></div>
+                <div class="stat-info">
+                    <h3>{{ placed_count }}+</h3>
+                    <p>Offers Disbursed</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                <div class="stat-info">
+                    <h3>₹{{ avg_pkg }} LPA</h3>
+                    <p>Average CTC Package</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     Latest Job Opportunities
+     =================================================================== -->
+<section style="padding: 50px 0;">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+            <div>
+                <span class="badge badge-primary" style="margin-bottom: 6px;">Campus Recruitment Drives</span>
+                <h2 style="font-size: 1.65rem; color: var(--dark-navy); margin: 0; font-weight: 700;">Active Placement Openings</h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 4px 0 0;">Review visiting corporate drives accepting applications from eligible cohorts.</p>
+            </div>
+            <a href="{% url 'drive_list' %}" class="btn btn-secondary btn-sm">
+                View All Available Drives <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 18px;">
+            {% for drive in latest_drives %}
+                <div class="job-card">
+                    <div>
+                        <div class="job-card-top">
+                            <div class="company-logo-avatar">
+                                {% if drive.company.logo %}
+                                    <img src="{{ drive.company.logo.url }}" alt="{{ drive.company.name }}" style="max-height: 38px; max-width: 38px; object-fit: contain;">
+                                {% else %}
+                                    {{ drive.company.name|make_list|first|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="job-header-info">
+                                <h4>
+                                    <a href="{% url 'drive_detail' drive.id %}" style="color: var(--dark-navy);">{{ drive.title }}</a>
+                                </h4>
+                                <div class="company-name">
+                                    <a href="{% url 'company_detail' drive.company.id %}" style="color: inherit;">
+                                        <i class="fa-solid fa-building" style="font-size: 0.8rem; margin-right: 4px;"></i> {{ drive.company.name }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="job-meta-grid">
+                            <div class="job-meta-item">
+                                <i class="fa-solid fa-indian-rupee-sign" style="color: var(--success); font-size: 0.78rem;"></i>
+                                <span>CTC: <strong>₹{{ drive.salary_package }} LPA</strong></span>
+                            </div>
+                            <div class="job-meta-item">
+                                <i class="fa-solid fa-user-clock" style="color: var(--warning); font-size: 0.78rem;"></i>
+                                <span>Exp: <strong>{{ drive.get_experience_required_display }}</strong></span>
+                            </div>
+                            <div class="job-meta-item">
+                                <i class="fa-solid fa-location-dot" style="color: var(--text-muted); font-size: 0.78rem;"></i>
+                                <span>{{ drive.location|truncatechars:18 }}</span>
+                            </div>
+                            <div class="job-meta-item">
+                                <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 0.78rem;"></i>
+                                <span>Min CGPA: <strong>{{ drive.minimum_cgpa }}</strong></span>
+                            </div>
+                            <div class="job-meta-item">
+                                <i class="fa-solid fa-briefcase" style="color: var(--text-muted); font-size: 0.78rem;"></i>
+                                <span>{{ drive.get_job_type_display }}</span>
+                            </div>
+                        </div>
+
+                        <div class="job-skills-wrap">
+                            {% for skill in drive.skills_list|slice:":3" %}
+                                <span class="skill-tag">{{ skill }}</span>
+                            {% endfor %}
+                            {% if drive.skills_list|length > 3 %}
+                                <span class="skill-tag">+{{ drive.skills_list|length|add:"-3" }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="job-card-actions">
+                        <span style="font-size: 0.78rem; color: var(--text-muted);">
+                            Deadline: <strong>{{ drive.application_deadline|date:"M d, Y" }}</strong>
+                        </span>
+                        <a href="{% url 'drive_detail' drive.id %}" class="btn btn-primary btn-sm">
+                            View & Apply &rarr;
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div style="grid-column: 1 / -1; text-align: center; padding: 36px;" class="card">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">No active placement drives currently published.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     Featured Partner Companies
+     =================================================================== -->
+<section style="padding: 48px 0; background: var(--surface-highlight); border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border);">
+    <div class="container">
+        <div style="text-align: center; max-width: 580px; margin: 0 auto 32px;">
+            <span class="badge badge-secondary" style="margin-bottom: 6px;">Enterprise Recruiters</span>
+            <h2 style="font-size: 1.65rem; color: var(--dark-navy); margin: 0; font-weight: 700;">Visiting Corporate Partners</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin: 4px 0 0;">Leading multinational corporations and engineering enterprises hiring campus talent.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px;">
+            {% for c in featured_companies %}
+                <a href="{% url 'company_detail' c.id %}" class="company-card" style="display: block; text-decoration: none; text-align: center;">
+                    <div class="logo-box">
+                        {% if c.logo %}
+                            <img src="{{ c.logo.url }}" alt="{{ c.name }}" style="max-height: 48px; max-width: 48px; object-fit: contain;">
+                        {% else %}
+                            {{ c.name|make_list|first|upper }}
+                        {% endif %}
+                    </div>
+                    <h4 style="font-size: 1rem; color: var(--dark-navy); margin-bottom: 3px; font-weight: 600;">{{ c.name }}</h4>
+                    <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 8px;">{{ c.industry }}</span>
+                    <div style="font-size: 0.8rem; font-weight: 600; color: var(--primary); background: var(--surface-well); border: 1px solid var(--card-border); padding: 2px 8px; border-radius: var(--radius-xs); display: inline-block;">
+                        Avg CTC: ₹{{ c.average_package }} LPA
+                    </div>
+                </a>
+            {% empty %}
+                <p style="text-align: center; color: var(--text-muted); grid-column: 1 / -1; font-size: 0.88rem;">No corporate partners registered yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     AI Career Features Showcase
+     =================================================================== -->
+<section style="padding: 54px 0;">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <span class="badge badge-purple" style="margin-bottom: 6px;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Career Suite
+                </span>
+                <h2 style="font-size: 1.65rem; color: var(--dark-navy); margin: 0; font-weight: 700;">Placement Advisory Engine</h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 4px 0 0;">Dedicated AI-powered tools designed to improve student employability and interview pass rates.</p>
+            </div>
+            <a href="{% url 'ai_assistant' %}" class="btn btn-primary btn-sm">
+                Open Career Assistant &rarr;
+            </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px;">
+            <!-- AI Card 1 -->
+            <div class="card" style="padding: 22px;">
+                <div class="ai-bot-avatar" style="margin-bottom: 14px;">
+                    <i class="fa-solid fa-file-shield"></i>
+                </div>
+                <h3 style="font-size: 1.1rem; margin-bottom: 6px; font-weight: 700;">ATS Resume Analyzer</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.55; margin-bottom: 16px;">
+                    Scan student resumes against real recruiter screening models. Uncover keyword gaps and verify readiness.
+                </p>
+                <a href="{% url 'ai_resume_analyzer' %}" class="btn btn-secondary btn-sm">
+                    Analyze Resume &rarr;
+                </a>
+            </div>
+
+            <!-- AI Card 2 -->
+            <div class="card" style="padding: 22px;">
+                <div class="ai-bot-avatar" style="margin-bottom: 14px; background: var(--primary);">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <h3 style="font-size: 1.1rem; margin-bottom: 6px; font-weight: 700;">Mock Interview Simulator</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.55; margin-bottom: 16px;">
+                    Simulate technical, HR, and aptitude interviews for TCS, Infosys, and Microsoft with instant AI feedback.
+                </p>
+                <a href="{% url 'ai_interview_prep' %}" class="btn btn-secondary btn-sm">
+                    Start Mock Interview &rarr;
+                </a>
+            </div>
+
+            <!-- AI Card 3 -->
+            <div class="card" style="padding: 22px;">
+                <div class="ai-bot-avatar" style="margin-bottom: 14px; background: var(--success);">
+                    <i class="fa-solid fa-route"></i>
+                </div>
+                <h3 style="font-size: 1.1rem; margin-bottom: 6px; font-weight: 700;">Technical Roadmaps</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.55; margin-bottom: 16px;">
+                    Step-by-step milestone pathways for Python Developer, Data Engineer, and AI/ML career tracks.
+                </p>
+                <a href="{% url 'ai_career_roadmap' %}" class="btn btn-secondary btn-sm">
+                    Explore Roadmaps &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     Student Placement Testimonials
+     =================================================================== -->
+<section style="padding: 48px 0; background: var(--surface-highlight); border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border);">
+    <div class="container">
+        <div style="text-align: center; max-width: 580px; margin: 0 auto 32px;">
+            <span class="badge badge-primary" style="margin-bottom: 6px;">Placement Records</span>
+            <h2 style="font-size: 1.65rem; color: var(--dark-navy); margin: 0; font-weight: 700;">Student Placement Outcomes</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin: 4px 0 0;">Recent graduates placed through the campus placement cell.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+            <!-- Story 1 -->
+            <div class="card" style="padding: 22px;">
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+                    <div class="avatar-circle" style="width: 48px; height: 48px;">
+                        <img src="{% static 'images/student_male.jpg' %}" alt="Rahul Sharma">
+                    </div>
+                    <div>
+                        <h4 style="font-size: 1.05rem; margin: 0; color: var(--dark-navy); font-weight: 700;">Rahul Sharma</h4>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">CSE Cohort &bull; 8.75 CGPA</div>
+                        <span class="badge badge-success" style="margin-top: 4px;">Placed at Microsoft (₹18.0 LPA)</span>
+                    </div>
+                </div>
+                <p style="color: var(--text-main); font-size: 0.88rem; line-height: 1.6; font-style: italic; margin: 0;">
+                    "The AI Career Assistant helped me spot missing microservices and system design competencies on my resume. Following the Python Developer Roadmap made all the difference during the campus hiring drive."
+                </p>
+            </div>
+
+            <!-- Story 2 -->
+            <div class="card" style="padding: 22px;">
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+                    <div class="avatar-circle" style="width: 48px; height: 48px;">
+                        <img src="{% static 'images/student_female.jpg' %}" alt="Priya Patel">
+                    </div>
+                    <div>
+                        <h4 style="font-size: 1.05rem; margin: 0; color: var(--dark-navy); font-weight: 700;">Priya Patel</h4>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">IT Cohort &bull; 8.40 CGPA</div>
+                        <span class="badge badge-purple" style="margin-top: 4px;">Placed at Deloitte (₹8.8 LPA)</span>
+                    </div>
+                </div>
+                <p style="color: var(--text-main); font-size: 0.88rem; line-height: 1.6; font-style: italic; margin: 0;">
+                    "Automated cutoff verification removed all uncertainty around drive eligibility. The Job Description Matcher helped me directly align my SQL and analytics projects with Deloitte's role criteria."
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================================================================
+     Minimalist Call To Action Section
+     =================================================================== -->
+<section style="padding: 50px 0; background: #0f172a; color: #ffffff;">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;">
+            <div>
+                <span class="badge" style="background: rgba(255,255,255,0.1); color: #cbd5e1; border-color: rgba(255,255,255,0.15); margin-bottom: 8px;">
+                    Campus Recruitment Cell
+                </span>
+                <h2 style="font-size: 1.75rem; color: #ffffff; margin: 0 0 6px 0; font-weight: 700;">
+                    Ready for the 2025–26 Recruitment Season?
+                </h2>
+                <p style="color: #94a3b8; font-size: 0.92rem; margin: 0; max-width: 540px;">
+                    Register as a student to discover active corporate recruitments, verify cutoffs, and prepare with the AI career assistant.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-primary" style="background: #ffffff; color: #0f172a !important; border-color: #ffffff;">
+                        <i class="fa-solid fa-user-plus"></i> Register as Student
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-secondary" style="background: transparent; color: #ffffff !important; border-color: rgba(255,255,255,0.3);">
+                        Sign In
+                    </a>
+                {% else %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary" style="background: #ffffff; color: #0f172a !important; border-color: #ffffff;">
+                        <i class="fa-solid fa-gauge-high"></i> Go to Dashboard
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

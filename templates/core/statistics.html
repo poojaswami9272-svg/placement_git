@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Placement Statistics & Analytics - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Minimalist Corporate Header -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-trophy" style="color: var(--primary);"></i> Institutional Accreditation Metrics
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    Institutional Placement Analytics
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 620px;">
+                    Validated placement metrics, salary distribution trajectories, department shortlisting ratios, and campus recruitment track records.
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <a href="{% url 'drive_list' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-briefcase"></i> View Current Drives
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+                <h3>{{ total_students }}</h3>
+                <p>Eligible Cohort</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-user-check"></i></div>
+            <div class="stat-info">
+                <h3>{{ placed_students }}</h3>
+                <p>Students Placed</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-percent"></i></div>
+            <div class="stat-info">
+                <h3>{{ placement_rate }}%</h3>
+                <p>Placement Ratio</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amber"><i class="fa-solid fa-building"></i></div>
+            <div class="stat-info">
+                <h3>{{ total_companies }}</h3>
+                <p>Corporate Partners</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Package Metrics Strip -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="card" style="padding: 18px 20px; border-left: 3px solid var(--success);">
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Highest CTC Package</span>
+            <div style="font-size: 1.85rem; font-weight: 800; color: var(--success); margin: 4px 0; font-feature-settings: 'tnum';">₹{{ highest_package }} LPA</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Top tier enterprise software engineering offer</p>
+        </div>
+        <div class="card" style="padding: 18px 20px; border-left: 3px solid var(--primary);">
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Average CTC Package</span>
+            <div style="font-size: 1.85rem; font-weight: 800; color: var(--primary); margin: 4px 0; font-feature-settings: 'tnum';">₹{{ avg_package }} LPA</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Institutional average across all campus drives</p>
+        </div>
+        <div class="card" style="padding: 18px 20px; border-left: 3px solid var(--accent-purple);">
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">Median CTC Package</span>
+            <div style="font-size: 1.85rem; font-weight: 800; color: var(--accent-purple); margin: 4px 0; font-feature-settings: 'tnum';">₹6.2 LPA</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Balanced median across all engineering branches</p>
+        </div>
+    </div>
+
+    <!-- Interactive Charts Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+        <!-- Chart 1: Package Distribution -->
+        <div class="card" style="padding: 20px; border: 1px solid var(--card-border);">
+            <h4 style="font-size: 1rem; margin-bottom: 14px; color: var(--dark-navy); font-weight: 700;">
+                <i class="fa-solid fa-chart-simple" style="color: var(--primary); margin-right: 6px;"></i> CTC Distribution Tier (LPA)
+            </h4>
+            <div style="height: 250px; position: relative;">
+                <canvas id="packageDistChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Chart 2: Department Placement Performance -->
+        <div class="card" style="padding: 20px; border: 1px solid var(--card-border);">
+            <h4 style="font-size: 1rem; margin-bottom: 14px; color: var(--dark-navy); font-weight: 700;">
+                <i class="fa-solid fa-graduation-cap" style="color: var(--primary); margin-right: 6px;"></i> Department Placement Success Rate
+            </h4>
+            <div style="height: 250px; position: relative;">
+                <canvas id="deptRateChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Recruiter Packages Table -->
+    <div class="card" style="border: 1px solid var(--card-border);">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="font-size: 1rem; margin: 0; font-weight: 700; color: var(--dark-navy);">Premier Campus Recruiters & Offer Statistics</h4>
+            <a href="{% url 'company_list' %}" class="btn btn-secondary btn-sm" style="font-size: 0.78rem;">Directory &rarr;</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Partner Enterprise</th>
+                        <th>Industry Domain</th>
+                        <th>Classification</th>
+                        <th>Average CTC</th>
+                        <th>Highest CTC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in top_recruiters %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'company_detail' c.id %}" style="font-weight: 600; color: var(--dark-navy);">
+                                    {{ c.name }}
+                                </a>
+                            </td>
+                            <td style="color: var(--text-muted); font-size: 0.85rem;">{{ c.industry }}</td>
+                            <td><span class="badge badge-secondary">{{ c.get_company_type_display }}</span></td>
+                            <td style="font-feature-settings: 'tnum'; font-weight: 600; color: var(--dark-navy);">₹{{ c.average_package }} LPA</td>
+                            <td style="font-feature-settings: 'tnum'; font-weight: 700; color: var(--success);">₹{{ c.highest_package }} LPA</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 18px;">No recruiter records available.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Package Distribution Chart
+    const pkgCtx = document.getElementById('packageDistChart');
+    if (pkgCtx) {
+        new Chart(pkgCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['< 4.5 LPA', '4.5 - 7.0 LPA', '7.0 - 10.0 LPA', '10.0 - 14.0 LPA', '> 14.0 LPA'],
+                datasets: [{
+                    label: 'Students Placed',
+                    data: [25, 80, 52, 21, 7],
+                    backgroundColor: '#1e40af',
+                    borderRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // Department Placement Rate Bar Chart
+    const deptCtx = document.getElementById('deptRateChart');
+    if (deptCtx) {
+        new Chart(deptCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['CSE', 'IT', 'AI & DS', 'ECE', 'EEE', 'Mechanical', 'Civil'],
+                datasets: [{
+                    label: 'Placement %',
+                    data: [92, 88, 86, 78, 68, 62, 58],
+                    backgroundColor: '#059669',
+                    borderRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { callback: v => v + '%' }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

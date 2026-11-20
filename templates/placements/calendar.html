@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Placement Calendar - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <h2 style="font-size: 1.85rem; margin-bottom: 4px;">Placement Drive & Interview Calendar</h2>
+            <p style="color: var(--text-muted);">Stay on top of upcoming campus recruitment dates, aptitude tests, and interview schedules.</p>
+        </div>
+        <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 8px 16px; border-radius: var(--radius-full);">
+            <i class="fa-solid fa-clock"></i> Current Date: {{ today|date:"F d, Y" }}
+        </div>
+    </div>
+
+    <!-- Calendar Layout Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        <!-- Left: Upcoming Drives Schedule -->
+        <div>
+            <div class="card" style="margin-bottom: 30px;">
+                <div class="card-header">
+                    <h4 style="font-size: 1.15rem; margin: 0;">
+                        <i class="fa-solid fa-calendar-days" style="color: var(--primary);"></i> Upcoming Placement Drives
+                    </h4>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Drive Date</th>
+                                    <th>Company & Role</th>
+                                    <th>Package</th>
+                                    <th>Application Deadline</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for drive in upcoming_drives %}
+                                    <tr>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <div style="width: 40px; height: 40px; border-radius: 8px; background: var(--primary-light); color: var(--primary); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; line-height: 1.1;">
+                                                    <span>{{ drive.drive_date|date:"d" }}</span>
+                                                    <span style="font-size: 0.65rem; text-transform: uppercase;">{{ drive.drive_date|date:"M" }}</span>
+                                                </div>
+                                                <span style="font-weight: 600;">{{ drive.drive_date|date:"l" }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'drive_detail' drive.id %}" style="font-weight: 700; color: var(--dark-navy);">
+                                                {{ drive.title }}
+                                            </a>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);">{{ drive.company.name }} &bull; {{ drive.location }}</div>
+                                        </td>
+                                        <td><strong style="color: var(--success);">₹{{ drive.salary_package }} LPA</strong></td>
+                                        <td style="color: var(--danger); font-size: 0.88rem;">{{ drive.application_deadline }}</td>
+                                        <td>
+                                            <a href="{% url 'drive_detail' drive.id %}" class="btn btn-secondary btn-sm">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                            No upcoming drives scheduled in the immediate calendar.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduled Interviews (If any for user) -->
+            {% if interviews %}
+                <div class="card">
+                    <div class="card-header">
+                        <h4 style="font-size: 1.15rem; margin: 0;">
+                            <i class="fa-solid fa-user-clock" style="color: var(--warning);"></i> Scheduled Assessment & Interview Sessions
+                        </h4>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Candidate / Drive</th>
+                                    <th>Round Type</th>
+                                    <th>Venue / Link</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for iv in interviews %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ iv.interview_date|date:"M d, Y" }}</strong>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);">{{ iv.interview_time|time:"g:i A" }}</div>
+                                        </td>
+                                        <td>
+                                            {% if user.is_officer %}
+                                                <div style="font-weight: 700;">{{ iv.application.student.full_name }}</div>
+                                            {% endif %}
+                                            <div style="font-size: 0.85rem; color: var(--primary);">{{ iv.application.job.company.name }} - {{ iv.application.job.title }}</div>
+                                        </td>
+                                        <td><span class="badge badge-orange">{{ iv.get_interview_type_display }}</span></td>
+                                        <td style="font-size: 0.85rem;">{{ iv.location_or_link|truncatechars:28 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Side: Application Deadlines Countdown -->
+        <div>
+            <div class="card" style="padding: 24px; margin-bottom: 24px;">
+                <h4 style="font-size: 1.1rem; margin-bottom: 16px;">
+                    <i class="fa-solid fa-hourglass-start" style="color: var(--danger);"></i> Urgent Deadlines
+                </h4>
+                
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    {% for dl in deadlines|slice:":6" %}
+                        <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 12px;">
+                            <a href="{% url 'drive_detail' dl.id %}" style="font-weight: 700; color: var(--dark-navy); font-size: 0.95rem; display: block;">
+                                {{ dl.title }}
+                            </a>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-top: 4px;">
+                                <span style="color: var(--text-muted);">{{ dl.company.name }}</span>
+                                <span style="color: var(--danger); font-weight: 700;">Ends {{ dl.application_deadline|date:"M d" }}</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">No urgent deadlines pending.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Guidance Card -->
+            <div class="card" style="padding: 24px; background: var(--surface-highlight); border-left: 4px solid var(--primary);">
+                <h5 style="font-size: 1rem; margin-bottom: 8px; color: var(--dark-navy);">Need Interview Prep?</h5>
+                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+                    Get role-specific technical questions, aptitude practice, and HR mock interviews powered by AI.
+                </p>
+                <a href="{% url 'ai_interview_prep' %}" class="btn btn-ai btn-sm" style="width: 100%;">
+                    Launch AI Interview Simulator
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

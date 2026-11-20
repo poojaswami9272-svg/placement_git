@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Access Denied (403) - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; text-align: center; margin-top: 50px;">
+    <div class="card" style="padding: 48px 32px; border-radius: var(--radius-xl);">
+        <div style="font-size: 5rem; font-weight: 800; color: var(--danger); line-height: 1; margin-bottom: 12px;">403</div>
+        <h2 style="font-size: 1.8rem; margin-bottom: 12px; color: var(--dark-navy);">Access Forbidden</h2>
+        <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 28px;">
+            You do not have administrative permission to view this placement resource. This section is restricted to authorized Placement Officers.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 12px;">
+            <a href="{% url 'home' %}" class="btn btn-primary">
+                <i class="fa-solid fa-house"></i> Return Home
+            </a>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="fa-solid fa-gauge-high"></i> My Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

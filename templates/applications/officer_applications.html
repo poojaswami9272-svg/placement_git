@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Applications - Placement Officer Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <h2 style="font-size: 1.85rem; margin-bottom: 4px;">Placement Drive Applications</h2>
+            <p style="color: var(--text-muted);">Shortlist applicants, schedule assessment rounds, manage interviews, and confirm placement selections.</p>
+        </div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 8px 16px; border-radius: var(--radius-full);">
+            <i class="fa-solid fa-file-signature"></i> Total Applications: {{ total_count }}
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="filter-card">
+        <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px; gap: 14px; align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Search Candidate / Roll</label>
+                <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Candidate name or roll...">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Placement Drive</label>
+                <select name="drive" class="form-control">
+                    <option value="">All Drives</option>
+                    {% for d in all_drives %}
+                        <option value="{{ d.id }}" {% if selected_drive == d.id|stringformat:"s" %}selected{% endif %}>
+                            {{ d.company.name }} - {{ d.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Application Status</label>
+                <select name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="APPLIED" {% if selected_status == 'APPLIED' %}selected{% endif %}>Applied</option>
+                    <option value="SHORTLISTED" {% if selected_status == 'SHORTLISTED' %}selected{% endif %}>Shortlisted</option>
+                    <option value="APTITUDE_TEST" {% if selected_status == 'APTITUDE_TEST' %}selected{% endif %}>Aptitude Test</option>
+                    <option value="TECHNICAL_INTERVIEW" {% if selected_status == 'TECHNICAL_INTERVIEW' %}selected{% endif %}>Technical Interview</option>
+                    <option value="HR_INTERVIEW" {% if selected_status == 'HR_INTERVIEW' %}selected{% endif %}>HR Interview</option>
+                    <option value="SELECTED" {% if selected_status == 'SELECTED' %}selected{% endif %}>Selected</option>
+                    <option value="REJECTED" {% if selected_status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Department</label>
+                <select name="dept" class="form-control">
+                    <option value="">All Departments</option>
+                    <option value="CSE" {% if selected_dept == 'CSE' %}selected{% endif %}>CSE</option>
+                    <option value="IT" {% if selected_dept == 'IT' %}selected{% endif %}>IT</option>
+                    <option value="AI_DS" {% if selected_dept == 'AI_DS' %}selected{% endif %}>AI & DS</option>
+                    <option value="ECE" {% if selected_dept == 'ECE' %}selected{% endif %}>ECE</option>
+                    <option value="EEE" {% if selected_dept == 'EEE' %}selected{% endif %}>EEE</option>
+                    <option value="MECH" {% if selected_dept == 'MECH' %}selected{% endif %}>Mechanical</option>
+                    <option value="CIVIL" {% if selected_dept == 'CIVIL' %}selected{% endif %}>Civil</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="height: 42px;">
+                <i class="fa-solid fa-filter"></i> Filter
+            </button>
+        </form>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="card">
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Drive & Role</th>
+                            <th>Academics</th>
+                            <th>Resume</th>
+                            <th>Status</th>
+                            <th>Officer Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in page_obj %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="avatar-circle">
+                                            {% if app.student.profile_photo %}
+                                                <img src="{{ app.student.profile_photo.url }}" alt="{{ app.student.full_name }}">
+                                            {% else %}
+                                                {{ app.student.full_name|make_list|first|upper }}
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'student_detail' app.student.id %}" style="font-weight: 700; color: var(--dark-navy);">
+                                                {{ app.student.full_name }}
+                                            </a>
+                                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                                {{ app.student.roll_number }} &bull; {{ app.student.department }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <strong>{{ app.job.title }}</strong>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                        {{ app.job.company.name }} &bull; ₹{{ app.job.salary_package }} LPA
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div style="font-size: 0.85rem;">
+                                        CGPA: <strong style="color: var(--primary);">{{ app.student.cgpa }}</strong>
+                                        <div style="font-size: 0.78rem; color: var(--text-muted);">Backlogs: {{ app.student.active_backlogs }}</div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {% if app.resume_file %}
+                                        <a href="{{ app.resume_file.url }}" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 0.8rem;">
+                                            <i class="fa-solid fa-file-pdf"></i> Resume
+                                        </a>
+                                    {% elif app.student.resume_file %}
+                                        <a href="{{ app.student.resume_file.url }}" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 0.8rem;">
+                                            <i class="fa-solid fa-file-pdf"></i> Resume
+                                        </a>
+                                    {% else %}
+                                        <span style="color: var(--danger); font-size: 0.8rem;">Missing</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <span class="badge {{ app.status_badge_class }}">{{ app.get_status_display }}</span>
+                                </td>
+
+                                <td>
+                                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                        <!-- Quick Status Modal Trigger -->
+                                        <button class="btn btn-secondary btn-sm" onclick="openStatusModal({{ app.id }}, '{{ app.status }}', '{{ app.student.full_name|escapejs }}')" title="Change Status">
+                                            <i class="fa-solid fa-arrows-rotate"></i>
+                                        </button>
+
+                                        <!-- Schedule Interview Trigger -->
+                                        <button class="btn btn-secondary btn-sm" onclick="openInterviewModal({{ app.id }}, '{{ app.student.full_name|escapejs }}', '{{ app.job.title|escapejs }}')" title="Schedule Interview">
+                                            <i class="fa-solid fa-calendar-plus" style="color: var(--warning);"></i>
+                                        </button>
+
+                                        <!-- Record Selection Offer Trigger -->
+                                        {% if app.status != 'SELECTED' %}
+                                            <button class="btn btn-primary btn-sm" onclick="openSelectionModal({{ app.id }}, '{{ app.student.full_name|escapejs }}', '{{ app.job.title|escapejs }}', '{{ app.job.salary_package }}')" title="Mark as Selected & Placed">
+                                                <i class="fa-solid fa-trophy"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                    No applications match the selected criteria.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: center; gap: 8px; margin-top: 30px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&drive={{ selected_drive }}&status={{ selected_status }}&dept={{ selected_dept }}" class="btn btn-secondary btn-sm">&laquo; Previous</a>
+            {% endif %}
+            <span class="btn btn-secondary btn-sm" style="cursor: default; background: var(--primary-light); color: var(--primary); font-weight: 700;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&drive={{ selected_drive }}&status={{ selected_status }}&dept={{ selected_dept }}" class="btn btn-secondary btn-sm">Next &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal 1: Status Update -->
+<div id="statusModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; overflow-y: auto; padding: 40px 16px;">
+    <div class="card" style="max-width: 480px; margin: 40px auto; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <h3 style="margin: 0; font-size: 1.25rem;">Update Application Status</h3>
+            <button onclick="document.getElementById('statusModal').style.display='none';" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" id="statusModalCandidate"></p>
+        <form method="post" id="statusForm">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <div class="form-group">
+                <label class="form-label">New Status *</label>
+                <select name="status" id="statusSelect" class="form-control">
+                    <option value="APPLIED">Applied</option>
+                    <option value="SHORTLISTED">Shortlisted</option>
+                    <option value="APTITUDE_TEST">Aptitude Test</option>
+                    <option value="TECHNICAL_INTERVIEW">Technical Interview</option>
+                    <option value="HR_INTERVIEW">HR Interview</option>
+                    <option value="SELECTED">Selected</option>
+                    <option value="REJECTED">Rejected</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Internal Officer Notes (Optional)</label>
+                <textarea name="notes" class="form-control" rows="2" placeholder="Feedback or round results..."></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('statusModal').style.display='none';">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal 2: Schedule Interview -->
+<div id="interviewModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; overflow-y: auto; padding: 40px 16px;">
+    <div class="card" style="max-width: 520px; margin: 40px auto; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <h3 style="margin: 0; font-size: 1.25rem;">Schedule Interview Round</h3>
+            <button onclick="document.getElementById('interviewModal').style.display='none';" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" id="interviewModalCandidate"></p>
+        <form method="post" id="interviewForm">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <div class="form-group">
+                <label class="form-label">Round Title *</label>
+                <input type="text" name="title" class="form-control" value="Round 1: Technical Interview" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Assessment / Interview Type *</label>
+                <select name="interview_type" class="form-control">
+                    <option value="TECHNICAL_INTERVIEW">Technical Interview</option>
+                    <option value="HR_INTERVIEW">HR Interview</option>
+                    <option value="APTITUDE_TEST">Aptitude Test</option>
+                    <option value="CODING_TEST">Coding Assessment</option>
+                    <option value="GROUP_DISCUSSION">Group Discussion</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Date *</label>
+                    <input type="date" name="interview_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Time *</label>
+                    <input type="time" name="interview_time" class="form-control" value="10:00" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Location / Online Meeting Link *</label>
+                <input type="text" name="location_or_link" class="form-control" value="Placement Cell Block A, Room 302" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Instructions for Candidate</label>
+                <textarea name="interviewer_notes" class="form-control" rows="2" placeholder="e.g. Please bring two copies of your resume and college ID proof."></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('interviewModal').style.display='none';">Cancel</button>
+                <button type="submit" class="btn btn-primary">Schedule & Notify Student</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal 3: Record Selection -->
+<div id="selectionModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; overflow-y: auto; padding: 40px 16px;">
+    <div class="card" style="max-width: 500px; margin: 40px auto; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <h3 style="margin: 0; font-size: 1.25rem;">Record Selection & Placement</h3>
+            <button onclick="document.getElementById('selectionModal').style.display='none';" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;" id="selectionModalCandidate"></p>
+        <form method="post" id="selectionForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Offered Job Role *</label>
+                <input type="text" name="job_role" id="selectionRole" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Offered CTC Package (LPA) *</label>
+                <input type="number" step="0.1" name="package_offered" id="selectionPackage" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Selection / Offer Date *</label>
+                <input type="date" name="selection_date" class="form-control" value="{% now 'Y-m-d' %}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Offer Letter (Optional PDF)</label>
+                <input type="file" name="offer_letter" class="form-control">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('selectionModal').style.display='none';">Cancel</button>
+                <button type="submit" class="btn btn-success">Confirm Selection & Mark Placed</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openStatusModal(appId, currentStatus, studentName) {
+    document.getElementById('statusModalCandidate').innerText = `Candidate: ${studentName}`;
+    document.getElementById('statusSelect').value = currentStatus;
+    document.getElementById('statusForm').action = `/applications/${appId}/status/`;
+    document.getElementById('statusModal').style.display = 'block';
+}
+
+function openInterviewModal(appId, studentName, jobTitle) {
+    document.getElementById('interviewModalCandidate').innerText = `Candidate: ${studentName} (${jobTitle})`;
+    document.getElementById('interviewForm').action = `/applications/${appId}/schedule-interview/`;
+    document.getElementById('interviewModal').style.display = 'block';
+}
+
+function openSelectionModal(appId, studentName, jobTitle, packageLpa) {
+    document.getElementById('selectionModalCandidate').innerText = `Candidate: ${studentName}`;
+    document.getElementById('selectionRole').value = jobTitle;
+    document.getElementById('selectionPackage').value = packageLpa;
+    document.getElementById('selectionForm').action = `/applications/${appId}/record-selection/`;
+    document.getElementById('selectionModal').style.display = 'block';
+}
+</script>
+{% endblock %}

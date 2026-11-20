@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Placement Drives & Jobs - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Minimalist Corporate Header -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-graduation-cap" style="color: var(--primary);"></i> Campus Recruitment Season 2025–26
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    Campus Placement Drives & Jobs
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 620px;">
+                    Browse active recruitment drives from verified enterprise recruiters. Evaluate role compensation, eligibility criteria, and apply before scheduled deadlines.
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                {% if user.is_authenticated and user.is_officer %}
+                    <a href="{% url 'drive_create' %}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-plus"></i> Post New Drive
+                    </a>
+                {% endif %}
+                <a href="{% url 'ai_assistant' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-purple);"></i> AI Matcher
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Multi-Filter & Search Bar -->
+    <div class="filter-card">
+        <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 110px; gap: 12px; align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Role / Company / Skills</label>
+                <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="e.g. Python, TCS, Analyst...">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Eligible Department</label>
+                <select name="dept" class="form-control">
+                    <option value="">All Departments</option>
+                    <option value="CSE" {% if selected_dept == 'CSE' %}selected{% endif %}>CSE</option>
+                    <option value="IT" {% if selected_dept == 'IT' %}selected{% endif %}>IT</option>
+                    <option value="AI_DS" {% if selected_dept == 'AI_DS' %}selected{% endif %}>AI & DS</option>
+                    <option value="ECE" {% if selected_dept == 'ECE' %}selected{% endif %}>ECE</option>
+                    <option value="EEE" {% if selected_dept == 'EEE' %}selected{% endif %}>EEE</option>
+                    <option value="MECH" {% if selected_dept == 'MECH' %}selected{% endif %}>Mechanical</option>
+                    <option value="CIVIL" {% if selected_dept == 'CIVIL' %}selected{% endif %}>Civil</option>
+                    <option value="MCA" {% if selected_dept == 'MCA' %}selected{% endif %}>MCA</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Job Type</label>
+                <select name="job_type" class="form-control">
+                    <option value="">All Job Types</option>
+                    <option value="FULL_TIME" {% if selected_job_type == 'FULL_TIME' %}selected{% endif %}>Full Time</option>
+                    <option value="INTERNSHIP" {% if selected_job_type == 'INTERNSHIP' %}selected{% endif %}>Internship</option>
+                    <option value="INTERNSHIP_FULL_TIME" {% if selected_job_type == 'INTERNSHIP_FULL_TIME' %}selected{% endif %}>Internship + Full Time</option>
+                    <option value="PART_TIME" {% if selected_job_type == 'PART_TIME' %}selected{% endif %}>Part Time</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Experience</label>
+                <select name="experience" class="form-control">
+                    <option value="">All Experience</option>
+                    {% for code, label in experience_choices %}
+                        <option value="{{ code }}" {% if selected_experience == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Min CTC (LPA)</label>
+                <input type="number" step="0.5" name="min_package" value="{{ min_package }}" class="form-control" placeholder="e.g. 8.0">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Sort By</label>
+                <select name="sort" class="form-control">
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="package_high" {% if sort_by == 'package_high' %}selected{% endif %}>Highest CTC</option>
+                    <option value="deadline" {% if sort_by == 'deadline' %}selected{% endif %}>Earliest Deadline</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="height: 38px;">
+                <i class="fa-solid fa-filter"></i> Apply
+            </button>
+        </form>
+
+        {% if user.is_authenticated and user.is_student %}
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <a href="?only_eligible=1" class="btn btn-sm {% if only_eligible %}btn-primary{% else %}btn-secondary{% endif %}">
+                    <i class="fa-solid fa-circle-check"></i> Show Only Drives I Am Eligible For
+                </a>
+                {% if q or selected_dept or selected_job_type or selected_experience or min_package or only_eligible %}
+                    <a href="{% url 'drive_list' %}" style="font-size: 0.82rem; color: var(--text-muted);">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Jobs Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 18px; margin-top: 20px;">
+        {% for drive in page_obj %}
+            <div class="job-card">
+                <div>
+                    <!-- Top Info -->
+                    <div class="job-card-top">
+                        <div class="company-logo-avatar">
+                            {% if drive.company.logo %}
+                                <img src="{{ drive.company.logo.url }}" alt="{{ drive.company.name }}">
+                            {% else %}
+                                {{ drive.company.name|make_list|first|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="job-header-info">
+                            <h4>
+                                <a href="{% url 'drive_detail' drive.id %}" style="color: var(--dark-navy);">{{ drive.title }}</a>
+                            </h4>
+                            <div class="company-name">
+                                <a href="{% url 'company_detail' drive.company.id %}" style="color: inherit;">
+                                    <i class="fa-solid fa-building" style="font-size: 0.78rem; margin-right: 4px;"></i> {{ drive.company.name }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Meta Grid -->
+                    <div class="job-meta-grid">
+                        <div class="job-meta-item">
+                            <i class="fa-solid fa-indian-rupee-sign" style="color: var(--success); font-size: 0.78rem;"></i>
+                            <span>Package: <strong>₹{{ drive.salary_package }} LPA</strong></span>
+                        </div>
+                        <div class="job-meta-item">
+                            <i class="fa-solid fa-user-clock" style="color: var(--warning); font-size: 0.78rem;"></i>
+                            <span>Exp: <strong>{{ drive.get_experience_required_display }}</strong></span>
+                        </div>
+                        <div class="job-meta-item">
+                            <i class="fa-solid fa-location-dot" style="color: var(--text-muted); font-size: 0.78rem;"></i>
+                            <span>{{ drive.location|truncatechars:18 }}</span>
+                        </div>
+                        <div class="job-meta-item">
+                            <i class="fa-solid fa-briefcase" style="color: var(--text-muted); font-size: 0.78rem;"></i>
+                            <span>{{ drive.get_job_type_display }}</span>
+                        </div>
+                        <div class="job-meta-item">
+                            <i class="fa-solid fa-graduation-cap" style="color: var(--primary); font-size: 0.78rem;"></i>
+                            <span>Min CGPA: <strong>{{ drive.minimum_cgpa }}</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Required Skills -->
+                    <div class="job-skills-wrap">
+                        {% for skill in drive.skills_list|slice:":4" %}
+                            <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                        {% if drive.skills_list|length > 4 %}
+                            <span class="skill-tag">+{{ drive.skills_list|length|add:"-4" }} more</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Footer & Action -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+                        <span><i class="fa-solid fa-clock"></i> Deadline: <strong>{{ drive.application_deadline|date:"M d, Y" }}</strong></span>
+                        <span><i class="fa-solid fa-users"></i> Vacancies: <strong>{{ drive.vacancies }}</strong></span>
+                    </div>
+
+                    <div class="job-card-actions">
+                        {% if drive.id in applied_job_ids %}
+                            <span class="badge badge-success" style="font-size: 0.8rem; padding: 5px 10px;">
+                                <i class="fa-solid fa-check"></i> Already Applied
+                            </span>
+                        {% elif drive.is_expired %}
+                            <span class="badge badge-secondary">Application Closed</span>
+                        {% else %}
+                            <a href="{% url 'drive_detail' drive.id %}" class="btn btn-primary btn-sm" style="flex: 1;">
+                                View & Apply &rarr;
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'drive_detail' drive.id %}" class="btn btn-secondary btn-sm" title="View Drive Details">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px;" class="card">
+                <i class="fa-solid fa-briefcase" style="font-size: 2.4rem; color: var(--text-light); margin-bottom: 12px;"></i>
+                <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">No placement drives match your criteria</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">Try adjusting your search query or department filters.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: center; gap: 6px; margin-top: 32px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&dept={{ selected_dept }}&job_type={{ selected_job_type }}&experience={{ selected_experience }}&min_package={{ min_package }}&sort={{ sort_by }}&only_eligible={{ only_eligible|yesno:'1,0' }}" class="btn btn-secondary btn-sm">&laquo; Previous</a>
+            {% endif %}
+            <span class="btn btn-secondary btn-sm" style="cursor: default; background: var(--surface-well); color: var(--dark-navy); font-weight: 600;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&dept={{ selected_dept }}&job_type={{ selected_job_type }}&experience={{ selected_experience }}&min_package={{ min_package }}&sort={{ sort_by }}&only_eligible={{ only_eligible|yesno:'1,0' }}" class="btn btn-secondary btn-sm">Next &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Career Roadmaps - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 920px;">
+    <!-- Minimalist Header Card -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-route" style="color: var(--primary);"></i> Competency Progression Framework
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    AI Technical Career Roadmaps
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 600px;">
+                    Structured multi-milestone career development pathways engineered to guide college students from core fundamentals to corporate placement offers.
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'drive_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-briefcase"></i> View Matching Jobs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Career Selection Tabs / Chips -->
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px;">
+        <a href="?career=python_developer" class="btn btn-sm {% if career_key == 'python_developer' %}btn-primary{% else %}btn-secondary{% endif %}">
+            <i class="fa-brands fa-python"></i> Python Developer
+        </a>
+        <a href="?career=fullstack_developer" class="btn btn-sm {% if career_key == 'fullstack_developer' %}btn-primary{% else %}btn-secondary{% endif %}">
+            <i class="fa-solid fa-layer-group"></i> Full Stack Developer
+        </a>
+        <a href="?career=data_analyst" class="btn btn-sm {% if career_key == 'data_analyst' %}btn-primary{% else %}btn-secondary{% endif %}">
+            <i class="fa-solid fa-chart-pie"></i> Data Analyst
+        </a>
+        <a href="?career=data_engineer" class="btn btn-sm {% if career_key == 'data_engineer' %}btn-primary{% else %}btn-secondary{% endif %}">
+            <i class="fa-solid fa-database"></i> Data Engineer
+        </a>
+        <a href="?career=ai_ml_engineer" class="btn btn-sm {% if career_key == 'ai_ml_engineer' %}btn-primary{% else %}btn-secondary{% endif %}">
+            <i class="fa-solid fa-brain"></i> AI / ML Engineer
+        </a>
+    </div>
+
+    <!-- Roadmap Timeline Container -->
+    <div class="card" style="padding: 24px 28px; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); border-radius: var(--radius-md);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <span class="badge badge-primary" style="margin-bottom: 4px;">
+                    <i class="fa-solid fa-flag-checkered"></i> Multi-Stage Progression Plan
+                </span>
+                <h3 style="font-size: 1.35rem; color: var(--dark-navy); margin: 0; font-weight: 700;">{{ roadmap.title }}</h3>
+            </div>
+            <a href="{% url 'drive_list' %}" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-briefcase"></i> Matching Drives &rarr;
+            </a>
+        </div>
+
+        <!-- Vertical Milestone Timeline -->
+        <div style="display: flex; flex-direction: column; gap: 16px; position: relative;">
+            {% for item in roadmap.steps %}
+                <div style="display: flex; align-items: flex-start; gap: 14px; position: relative;">
+                    <!-- Step Indicator Badge -->
+                    <div style="width: 28px; height: 28px; border-radius: var(--radius-xs); background: var(--surface-well); border: 1px solid var(--card-border); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; flex-shrink: 0;">
+                        {{ item.step }}
+                    </div>
+
+                    <!-- Step Content Card -->
+                    <div style="flex: 1; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); padding: 14px 18px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <h4 style="font-size: 0.98rem; color: var(--dark-navy); margin: 0; font-weight: 600;">{{ item.title }}</h4>
+                            <span class="badge badge-secondary" style="font-size: 0.72rem;">Milestone {{ item.step }}</span>
+                        </div>
+                        <p style="color: var(--text-main); font-size: 0.85rem; line-height: 1.55; margin: 0;">
+                            {{ item.desc }}
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Bottom Action Strip -->
+        <div style="margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+            <div>
+                <h5 style="margin: 0; font-size: 0.92rem; font-weight: 600; color: var(--dark-navy);">Benchmark Technical Preparedness</h5>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Test role competencies with company-specific mock questions.</span>
+            </div>
+            <a href="{% url 'ai_interview_prep' %}" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-chalkboard-user"></i> Practice Interview &rarr;
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

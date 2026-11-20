@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 840px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+            <h2 style="font-size: 1.8rem; margin-bottom: 4px;">Edit Student Profile</h2>
+            <p style="color: var(--text-muted);">Keep your academic and contact details updated for placement drives</p>
+        </div>
+        <a href="{% url 'student_profile' %}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Back to Profile
+        </a>
+    </div>
+
+    <div class="card" style="padding: 32px; border-radius: var(--radius-xl);">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <h4 style="font-size: 1.05rem; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--card-border);">
+                <i class="fa-solid fa-id-card"></i> Personal Information
+            </h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    {{ form.full_name }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Profile Photo</label>
+                    {{ form.profile_photo }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">About / Bio</label>
+                {{ form.bio }}
+            </div>
+
+            <h4 style="font-size: 1.05rem; color: var(--primary); margin: 24px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--card-border);">
+                <i class="fa-solid fa-graduation-cap"></i> Academics & Qualifications
+            </h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Department / Branch</label>
+                    {{ form.department }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Academic Year</label>
+                    {{ form.current_year }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Current CGPA (out of 10.0)</label>
+                    {{ form.cgpa }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">10th Percentage (%)</label>
+                    {{ form.tenth_percentage }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">12th / Diploma (%)</label>
+                    {{ form.twelfth_percentage }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Active Backlogs</label>
+                    {{ form.active_backlogs }}
+                </div>
+            </div>
+
+            <h4 style="font-size: 1.05rem; color: var(--primary); margin: 24px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--card-border);">
+                <i class="fa-solid fa-bolt"></i> Skills & Career Objectives
+            </h4>
+
+            <div class="form-group">
+                <label class="form-label">Technical Skills (comma-separated)</label>
+                {{ form.skills }}
+                <small style="color: var(--text-muted);">e.g. Python, Django, PostgreSQL, HTML5, Docker, Git</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Target Career Roles & Interests</label>
+                {{ form.career_interests }}
+            </div>
+
+            <h4 style="font-size: 1.05rem; color: var(--primary); margin: 24px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--card-border);">
+                <i class="fa-solid fa-link"></i> Web & Social Links
+            </h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-brands fa-linkedin" style="color: #0077b5;"></i> LinkedIn URL</label>
+                    {{ form.linkedin_url }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-brands fa-github"></i> GitHub URL</label>
+                    {{ form.github_url }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-solid fa-globe"></i> Portfolio URL</label>
+                    {{ form.portfolio_url }}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 14px; margin-top: 24px;">
+                <button type="submit" class="btn btn-primary" style="padding: 12px 28px;">
+                    <i class="fa-solid fa-check"></i> Save Changes
+                </button>
+                <a href="{% url 'student_profile' %}" class="btn btn-secondary" style="padding: 12px 24px;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

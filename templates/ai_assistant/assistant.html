@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Career Assistant - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Minimalist Corporate Command Header -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-microchip" style="color: var(--primary);"></i> Campus Placement Intelligence Engine
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    AI Career & Placement Assistant
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 620px;">
+                    Consult our dedicated placement mentor for personalized drive recommendations, eligibility audits, resume optimization, and interview preparation.
+                </p>
+            </div>
+
+            <!-- Quick module links -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a href="{% url 'ai_resume_analyzer' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-file-lines" style="color: var(--primary);"></i> Resume ATS Audit
+                </a>
+                <a href="{% url 'ai_jd_analyzer' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-code-compare" style="color: var(--info);"></i> JD Matcher
+                </a>
+                <a href="{% url 'ai_interview_prep' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-chalkboard-user" style="color: var(--success);"></i> Interview Prep
+                </a>
+                <a href="{% url 'ai_career_roadmap' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-route" style="color: var(--accent-purple);"></i> Roadmaps
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chat Window -->
+    <div class="ai-chat-wrapper">
+        <!-- Sidebar with Quick Action Chips -->
+        <aside class="ai-sidebar">
+            <div class="ai-sidebar-header">
+                <div class="ai-bot-avatar">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <h4 style="font-size: 0.92rem; margin: 0; font-weight: 700; color: var(--dark-navy);">Placement Mentor</h4>
+                    <span style="font-size: 0.74rem; color: var(--success); font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                        <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Active & Ready
+                    </span>
+                </div>
+            </div>
+
+            <div>
+                <span style="font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; display: block;">
+                    Recommended Inquiries
+                </span>
+                <div class="quick-prompts-list">
+                    <button class="quick-prompt-btn" data-prompt="Find the latest campus jobs suitable for my profile and skills">
+                        <i class="fa-solid fa-briefcase" style="color: var(--primary); font-size: 0.85rem;"></i> Find Jobs For Me
+                    </button>
+                    <button class="quick-prompt-btn" data-prompt="Check my placement eligibility and minimum CGPA requirements">
+                        <i class="fa-solid fa-clipboard-check" style="color: var(--success); font-size: 0.85rem;"></i> Check My Eligibility
+                    </button>
+                    <button class="quick-prompt-btn" data-prompt="Give me actionable tips to optimize my resume for tech placements">
+                        <i class="fa-solid fa-file-lines" style="color: var(--info); font-size: 0.85rem;"></i> Analyze My Resume
+                    </button>
+                    <button class="quick-prompt-btn" data-prompt="How should I prepare for technical interviews at TCS, Infosys, and Microsoft?">
+                        <i class="fa-solid fa-comments" style="color: var(--warning); font-size: 0.85rem;"></i> Prepare For Interview
+                    </button>
+                    <button class="quick-prompt-btn" data-prompt="I want to become a Data Engineer. What skills and roadmap should I follow?">
+                        <i class="fa-solid fa-route" style="color: var(--accent-purple); font-size: 0.85rem;"></i> Career Roadmaps
+                    </button>
+                    <button class="quick-prompt-btn" data-prompt="I know Python, Django and SQL. Which roles and companies should I target?">
+                        <i class="fa-solid fa-bullseye" style="color: var(--danger); font-size: 0.85rem;"></i> Role Recommendations
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Features Direct Navigation Links -->
+            <div style="margin-top: auto; padding-top: 14px; border-top: 1px solid var(--card-border);">
+                <span style="font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; display: block;">
+                    Specialized Tools
+                </span>
+                <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem;">
+                    <a href="{% url 'ai_resume_analyzer' %}" style="color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
+                        <span><i class="fa-solid fa-file-lines" style="margin-right: 6px;"></i> Resume ATS Audit</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                    </a>
+                    <a href="{% url 'ai_jd_analyzer' %}" style="color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
+                        <span><i class="fa-solid fa-code-compare" style="margin-right: 6px;"></i> Job Description Matcher</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                    </a>
+                    <a href="{% url 'ai_interview_prep' %}" style="color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
+                        <span><i class="fa-solid fa-chalkboard-user" style="margin-right: 6px;"></i> Mock Interview Simulator</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                    </a>
+                    <a href="{% url 'ai_career_roadmap' %}" style="color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
+                        <span><i class="fa-solid fa-route" style="margin-right: 6px;"></i> Career Milestone Roadmaps</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <section class="ai-chat-container">
+            <div class="chat-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--success);"></div>
+                    <span style="font-weight: 600; font-size: 0.88rem; color: var(--dark-navy);">Live Career Guidance Session</span>
+                </div>
+                <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">Model: Semantic Career Core v2.4</span>
+            </div>
+
+            <!-- Messages Stream -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Initial Message -->
+                <div class="chat-message ai">
+                    <div class="ai-bot-avatar" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <div class="chat-bubble">
+                        <strong style="color: var(--dark-navy);">Hello{% if user.is_authenticated %}, {{ user.first_name|default:user.username }}{% endif %}! Welcome to your Placement Career Advisory session.</strong>
+                        <p style="margin-top: 6px; margin-bottom: 0; color: var(--text-main); font-size: 0.88rem;">
+                            I can evaluate your profile against visiting recruitment drives, verify eligibility criteria, audit your resume against technical keywords, or simulate interview rounds. How can I assist your placement preparation today?
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="chat-input-bar">
+                {% csrf_token %}
+                <input type="text" id="chatInput" placeholder="Type your placement question or select an inquiry from the sidebar...">
+                <button type="button" class="btn btn-primary" id="sendBtn">
+                    <i class="fa-solid fa-paper-plane"></i> Send
+                </button>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    window.AIChatEngine.init('chatMessages', 'chatInput', 'sendBtn', '{% url "ai_assistant" %}');
+});
+</script>
+{% endblock %}

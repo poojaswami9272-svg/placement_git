@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Job Description Matcher - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container" style="max-width: 920px;">
+    <!-- Minimalist Header Card -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-code-compare" style="color: var(--primary);"></i> Semantic Competency Matcher
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    AI Job Description Matcher
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 600px;">
+                    Paste a recruitment job posting to evaluate your compatibility percentage, uncover missing proficiencies, and optimize your application strategy.
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'drive_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-briefcase"></i> Browse Active Drives
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Form -->
+    <div class="card" style="padding: 22px 24px; margin-bottom: 24px; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm);">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Job Description / Requirements *</label>
+                <textarea name="jd_text" class="form-control" rows="5" placeholder="Paste the recruiter's job description, technical requirements, or job post details here..." required>{{ jd_text }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Candidate Skills (comma-separated)</span>
+                    {% if student_skills_list %}
+                        <small style="color: var(--primary); font-weight: 600; font-size: 0.78rem;">(Pre-filled from your student profile)</small>
+                    {% endif %}
+                </label>
+                <input type="text" name="student_skills" class="form-control" value="{{ student_skills_list|join:', ' }}" placeholder="e.g. Python, Django, SQL, React, Git">
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary" style="padding: 9px 20px;">
+                    <i class="fa-solid fa-calculator"></i> Calculate Match Percentage
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Match Result Section -->
+    {% if match_result %}
+        <div class="card" style="padding: 24px 28px; border: 1px solid var(--card-border); box-shadow: var(--shadow-md); margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 18px; margin-bottom: 18px; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <span class="badge badge-primary" style="margin-bottom: 6px;">
+                        <i class="fa-solid fa-circle-check"></i> Evaluation Complete
+                    </span>
+                    <h3 style="font-size: 1.35rem; color: var(--dark-navy); margin: 0; font-weight: 700;">Role Alignment Scorecard</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 3px;">Competency correlation between candidate and role specifications</p>
+                </div>
+
+                <div style="text-align: right;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: {% if match_result.match_percentage >= 75 %}var(--success){% else %}var(--primary){% endif %}; line-height: 1; font-feature-settings: 'tnum';">
+                        {{ match_result.match_percentage }}%
+                    </div>
+                    <span style="font-size: 0.78rem; font-weight: 600; color: {% if match_result.match_percentage >= 75 %}var(--success){% else %}var(--primary){% endif %};">
+                        Compatibility Score
+                    </span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div class="progress-bar-container" style="height: 6px;">
+                    <div class="progress-bar-fill {% if match_result.match_percentage >= 75 %}success{% endif %}" style="width: {{ match_result.match_percentage }}%;"></div>
+                </div>
+            </div>
+
+            <!-- Matching Skills vs Skills to Improve -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                <div style="background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--success); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-circle-check"></i> Matching Skills ({{ match_result.matching_skills|length }})
+                        </span>
+                    </div>
+                    <div class="job-skills-wrap" style="margin-bottom: 0;">
+                        {% for s in match_result.matching_skills %}
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-check" style="font-size: 0.65rem;"></i> {{ s }}
+                            </span>
+                        {% empty %}
+                            <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;">No direct skill matches identified.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--warning); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Skills to Acquire ({{ match_result.skills_to_improve|length }})
+                        </span>
+                    </div>
+                    <div class="job-skills-wrap" style="margin-bottom: 0;">
+                        {% for s in match_result.skills_to_improve %}
+                            <span class="badge badge-warning">
+                                <i class="fa-solid fa-plus" style="font-size: 0.65rem;"></i> {{ s }}
+                            </span>
+                        {% empty %}
+                            <p style="color: var(--success); font-size: 0.82rem; margin: 0;">No notable gap skills detected.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendation Alert -->
+            <div style="padding: 12px 16px; background: var(--surface-highlight); border: 1px solid var(--card-border); border-left: 3px solid var(--primary); border-radius: var(--radius-xs); font-size: 0.88rem; color: var(--text-main);">
+                <strong style="color: var(--dark-navy);"><i class="fa-solid fa-compass" style="color: var(--primary); margin-right: 6px;"></i> Advisor Feedback:</strong> {{ match_result.recommendation }}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

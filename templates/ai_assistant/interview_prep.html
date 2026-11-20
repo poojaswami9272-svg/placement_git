@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Interview Preparation Simulator - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Minimalist Corporate Interview Simulator Header -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-chalkboard-user" style="color: var(--primary);"></i> Enterprise Mock Panel Simulator
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    AI Campus Interview Simulator
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 620px;">
+                    Practice company-targeted Technical, HR, and Aptitude rounds for premier recruiters. Submit responses for immediate rubric scoring and STAR-method critique.
+                </p>
+            </div>
+            <div style="display: flex; gap: 6px; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap;">
+                <span class="badge badge-secondary"><i class="fa-solid fa-code"></i> Coding & Tech</span>
+                <span class="badge badge-secondary"><i class="fa-solid fa-users"></i> Behavioral & HR</span>
+                <span class="badge badge-secondary"><i class="fa-solid fa-brain"></i> Aptitude</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulator Filter Bar -->
+    <div class="card" style="padding: 16px 20px; margin-bottom: 24px; border: 1px solid var(--card-border); box-shadow: var(--shadow-subtle);">
+        <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 130px; gap: 12px; align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Target Company</label>
+                <select name="company" class="form-control" style="font-size: 0.85rem; padding: 7px 10px;">
+                    <option value="TCS" {% if company_name == 'TCS' %}selected{% endif %}>TCS</option>
+                    <option value="Infosys" {% if company_name == 'Infosys' %}selected{% endif %}>Infosys</option>
+                    <option value="Wipro" {% if company_name == 'Wipro' %}selected{% endif %}>Wipro</option>
+                    <option value="Accenture" {% if company_name == 'Accenture' %}selected{% endif %}>Accenture</option>
+                    <option value="Microsoft" {% if company_name == 'Microsoft' %}selected{% endif %}>Microsoft</option>
+                    <option value="Deloitte" {% if company_name == 'Deloitte' %}selected{% endif %}>Deloitte</option>
+                    <option value="Capgemini" {% if company_name == 'Capgemini' %}selected{% endif %}>Capgemini</option>
+                    <option value="Amazon" {% if company_name == 'Amazon' %}selected{% endif %}>Amazon</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Role / Designation</label>
+                <select name="role" class="form-control" style="font-size: 0.85rem; padding: 7px 10px;">
+                    <option value="Python Developer" {% if role == 'Python Developer' %}selected{% endif %}>Python / Django Developer</option>
+                    <option value="Full Stack Developer" {% if role == 'Full Stack Developer' %}selected{% endif %}>Full Stack Developer</option>
+                    <option value="Data Analyst" {% if role == 'Data Analyst' %}selected{% endif %}>Data Analyst</option>
+                    <option value="Data Engineer" {% if role == 'Data Engineer' %}selected{% endif %}>Data Engineer</option>
+                    <option value="Software Engineer" {% if role == 'Software Engineer' %}selected{% endif %}>Software Engineer / SDE</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.8rem;">Interview Round</label>
+                <select name="round" class="form-control" style="font-size: 0.85rem; padding: 7px 10px;">
+                    <option value="technical" {% if round_type == 'technical' %}selected{% endif %}>Technical Interview</option>
+                    <option value="hr" {% if round_type == 'hr' %}selected{% endif %}>HR / Behavioral</option>
+                    <option value="aptitude" {% if round_type == 'aptitude' %}selected{% endif %}>Aptitude & Logical</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm" style="height: 38px;">
+                <i class="fa-solid fa-arrows-rotate"></i> Load Questions
+            </button>
+        </form>
+    </div>
+
+    <!-- Questions Layout Grid -->
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px;">
+        <!-- Left: Questions Bank -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h3 style="font-size: 1.15rem; margin: 0; color: var(--dark-navy); font-weight: 700;">
+                    {{ company_name }} &bull; {{ role }} ({{ round_type|title }} Round)
+                </h3>
+                <span class="badge badge-primary">{{ questions|length }} Curated Questions</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                {% for q in questions %}
+                    <div class="card" style="padding: 18px 20px; border: 1px solid var(--card-border); box-shadow: var(--shadow-subtle);">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;">
+                            <div style="width: 26px; height: 26px; border-radius: var(--radius-xs); background: var(--surface-well); border: 1px solid var(--card-border); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0;">
+                                {{ forloop.counter }}
+                            </div>
+                            <h4 style="font-size: 0.98rem; margin: 0; line-height: 1.45; color: var(--dark-navy); font-weight: 600;">
+                                {{ q.q }}
+                            </h4>
+                        </div>
+
+                        <div style="padding: 10px 14px; background: var(--surface-well); border-radius: var(--radius-xs); border-left: 2px solid var(--primary); margin-bottom: 12px; font-size: 0.84rem; color: var(--text-muted); line-height: 1.5;">
+                            <strong style="color: var(--dark-navy);"><i class="fa-solid fa-lightbulb" style="color: var(--warning); margin-right: 4px;"></i> Recommended Strategy:</strong> {{ q.tips }}
+                        </div>
+
+                        <button class="btn btn-secondary btn-sm" onclick="populateAnswerBox('{{ q.q|escapejs }}')">
+                            <i class="fa-solid fa-pen"></i> Practice This Question &rarr;
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right: Interactive Answer & AI Feedback Submission Box -->
+        <div>
+            <div class="card" style="padding: 22px; position: sticky; top: 80px; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                    <i class="fa-solid fa-microphone-lines" style="color: var(--primary); font-size: 1.1rem;"></i>
+                    <h4 style="font-size: 1.05rem; margin: 0; color: var(--dark-navy); font-weight: 700;">Live Answer Evaluation</h4>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;">
+                    Draft your response below to receive instant AI scoring on structure, clarity, and terminology.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="form-label" style="font-size: 0.8rem;">Selected Question</label>
+                        <textarea name="question_text" id="selectedQuestionInput" class="form-control" rows="2" readonly style="background: var(--surface-well); font-size: 0.82rem; resize: none;">{{ questions.0.q }}</textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label" style="font-size: 0.8rem;">Your Prepared Answer *</label>
+                        <textarea name="user_answer" class="form-control" rows="6" placeholder="Structure your response clearly using the STAR framework (Situation, Task, Action, Result)..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fa-solid fa-paper-plane"></i> Submit for AI Critique
+                    </button>
+                </form>
+
+                <!-- Feedback Display Box -->
+                {% if feedback %}
+                    <div style="margin-top: 18px; padding: 14px 16px; border-radius: var(--radius-sm); background: var(--surface-well); border: 1px solid var(--card-border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+                            <span class="badge badge-success">{{ feedback.status }}</span>
+                            <strong style="color: var(--dark-navy); font-size: 0.95rem; font-feature-settings: 'tnum';">Score: {{ feedback.score }}</strong>
+                        </div>
+                        <div style="font-size: 0.82rem; margin-bottom: 6px; color: var(--text-main);">
+                            <strong style="color: var(--success);"><i class="fa-solid fa-check"></i> Strengths:</strong> {{ feedback.strengths }}
+                        </div>
+                        <div style="font-size: 0.82rem; color: var(--text-main);">
+                            <strong style="color: var(--warning);"><i class="fa-solid fa-arrow-up"></i> Improvement:</strong> {{ feedback.improvement }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function populateAnswerBox(questionText) {
+    document.getElementById('selectedQuestionInput').value = questionText;
+    window.scrollTo({
+        top: document.getElementById('selectedQuestionInput').offsetTop - 100,
+        behavior: 'smooth'
+    });
+}
+</script>
+{% endblock %}

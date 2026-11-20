@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ drive.title }} - {{ drive.company.name }} | AI Placement Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Drive Banner Hero Image -->
+    {% if drive.banner_image %}
+        <div style="height: 200px; border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 24px; position: relative; box-shadow: var(--shadow-md);">
+            <img src="{{ drive.banner_image.url }}" alt="{{ drive.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+            <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.3) 100%); display: flex; align-items: flex-end; padding: 24px 32px;">
+                <div style="color: #ffffff;">
+                    <span class="badge" style="background: rgba(255,255,255,0.2); color: #fff; margin-bottom: 6px; backdrop-filter: blur(4px);">
+                        <i class="fa-solid fa-graduation-cap"></i> Verified Campus Drive 2025–26
+                    </span>
+                    <h2 style="font-size: 1.6rem; margin: 0; color: #ffffff;">{{ drive.company.name }} Official Recruitment Drive</h2>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Top Job Header Card -->
+    <div class="card" style="padding: 24px; margin-bottom: 20px; border: 1px solid var(--card-border); background: var(--card-bg);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
+                <div class="company-logo-avatar" style="width: 64px; height: 64px; font-size: 1.6rem; border-radius: var(--radius-sm); background: var(--card-bg-solid); box-shadow: var(--shadow-subtle);">
+                    {% if drive.company.logo %}
+                        <img src="{{ drive.company.logo.url }}" alt="{{ drive.company.name }}">
+                    {% else %}
+                        {{ drive.company.name|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div>
+                    <h1 style="font-size: 2rem; margin-bottom: 6px; color: var(--dark-navy);">{{ drive.title }}</h1>
+                    <div style="font-size: 1.1rem; color: var(--text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <a href="{% url 'company_detail' drive.company.id %}" style="font-weight: 700; color: var(--primary);">
+                            <i class="fa-solid fa-building"></i> {{ drive.company.name }}
+                        </a>
+                        &bull;
+                        <span><i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> {{ drive.location }}</span>
+                        &bull;
+                        <span class="badge badge-primary">{{ drive.get_job_type_display }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Area / Officer Controls -->
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                {% if user.is_authenticated and user.is_officer %}
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{% url 'drive_edit' drive.id %}" class="btn btn-secondary btn-sm">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit Drive
+                        </a>
+                        <a href="{% url 'drive_delete' drive.id %}" class="btn btn-danger btn-sm">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </a>
+                    </div>
+                {% endif %}
+
+                <div style="text-align: right;">
+                    <div style="font-size: 1.85rem; font-weight: 800; color: var(--primary);">₹{{ drive.salary_package }} LPA</div>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Annual CTC Package</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meta Summary Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--card-border);">
+            <div>
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Experience</span>
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--warning); margin-top: 2px;">{{ drive.get_experience_required_display }}</div>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Minimum CGPA</span>
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--dark-navy); margin-top: 2px;">{{ drive.minimum_cgpa }} / 10.0</div>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Max Backlogs Allowed</span>
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--dark-navy); margin-top: 2px;">{{ drive.max_backlogs }}</div>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Eligible Years</span>
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--dark-navy); margin-top: 2px;">Year {{ drive.eligible_years }}</div>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Drive Date</span>
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent-purple); margin-top: 2px;">{{ drive.drive_date }}</div>
+            </div>
+            <div>
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Deadline</span>
+                <div style="font-size: 1.25rem; font-weight: 800; color: {% if drive.is_expired %}var(--danger){% else %}var(--success){% endif %}; margin-top: 2px;">
+                    {{ drive.application_deadline }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Eligibility Banner (Requirement 8) -->
+    {% if user.is_authenticated and user.is_student %}
+        <div class="card" style="margin-bottom: 20px; padding: 18px 20px; border: 1px solid var(--card-border); border-left: 3px solid {% if eligibility_result.is_eligible %}var(--success){% else %}var(--danger){% endif %};">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                    <div style="font-size: 2rem; color: {% if eligibility_result.is_eligible %}var(--success){% else %}var(--danger){% endif %};">
+                        {% if eligibility_result.is_eligible %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 style="font-size: 1.15rem; margin-bottom: 4px; color: var(--dark-navy);">
+                            {% if eligibility_result.is_eligible %}
+                                You are eligible to apply!
+                            {% else %}
+                                You are currently not eligible for this placement drive.
+                            {% endif %}
+                        </h4>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">
+                            Student CGPA: <strong>{{ student_profile.cgpa }}</strong> &bull; 
+                            Required CGPA: <strong>{{ drive.minimum_cgpa }}</strong> &bull; 
+                            Dept: <strong>{{ student_profile.department }}</strong>
+                        </div>
+                        {% if not eligibility_result.is_eligible %}
+                            <ul style="margin-top: 8px; color: var(--danger); font-size: 0.88rem; padding-left: 18px;">
+                                {% for reason in eligibility_result.reasons %}
+                                    <li>{{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Apply Button Action -->
+                <div>
+                    {% if has_applied %}
+                        <div style="text-align: right;">
+                            <span class="badge {{ application.status_badge_class }}" style="font-size: 1rem; padding: 8px 16px;">
+                                Application Status: {{ application.get_status_display }}
+                            </span>
+                            <div style="margin-top: 6px;">
+                                <a href="{% url 'my_applications' %}" style="font-size: 0.85rem; font-weight: 600;">View in My Applications &rarr;</a>
+                            </div>
+                        </div>
+                    {% elif drive.is_expired %}
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fa-solid fa-lock"></i> Application Closed
+                        </button>
+                    {% elif eligibility_result.is_eligible %}
+                        <form action="{% url 'apply_job' drive.id %}" method="post" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-lg" onclick="return confirm('Confirm submission of your application and resume for {{ drive.title }}?');">
+                                <i class="fa-solid fa-paper-plane"></i> Apply Now
+                            </button>
+                        </form>
+                    {% else %}
+                        <button class="btn btn-secondary" disabled title="Not eligible to apply">
+                            Ineligible to Apply
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% elif not user.is_authenticated %}
+        <div class="card" style="margin-bottom: 30px; padding: 20px 24px; background: var(--surface-highlight); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+            <div>
+                <strong>Want to check your eligibility and apply?</strong> Sign in with your student account.
+            </div>
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">
+                Login to Apply
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Main 2-Column Content -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        <div>
+            <!-- Job Description -->
+            <div class="card" style="padding: 28px; margin-bottom: 24px;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 14px; color: var(--dark-navy);">Role Overview & Job Description</h3>
+                <p style="color: var(--text-main); font-size: 0.98rem; line-height: 1.8; white-space: pre-line;">
+                    {{ drive.description }}
+                </p>
+            </div>
+
+            <!-- Selection Process -->
+            <div class="card" style="padding: 28px; margin-bottom: 24px;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 14px; color: var(--dark-navy);">
+                    <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Selection Process & Rounds
+                </h3>
+                <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.8; white-space: pre-line;">
+                    {{ drive.selection_process }}
+                </p>
+            </div>
+
+            <!-- Required Skills Breakdown -->
+            <div class="card" style="padding: 28px; margin-bottom: 24px;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 14px; color: var(--dark-navy);">Required Technologies & Skills</h3>
+                <div class="job-skills-wrap">
+                    {% for skill in drive.skills_list %}
+                        <span class="skill-tag" style="background: var(--primary-light); color: var(--primary); font-size: 0.9rem; padding: 6px 14px;">
+                            {{ skill }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Other jobs from this company -->
+            {% if other_jobs %}
+                <div style="margin-top: 30px;">
+                    <h4 style="font-size: 1.15rem; margin-bottom: 14px; color: var(--dark-navy);">More Drives from {{ drive.company.name }}</h4>
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        {% for oj in other_jobs %}
+                            <div class="card" style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h5 style="margin: 0; font-size: 1rem;"><a href="{% url 'drive_detail' oj.id %}">{{ oj.title }}</a></h5>
+                                    <span style="font-size: 0.82rem; color: var(--text-muted);">{{ oj.location }} &bull; ₹{{ oj.salary_package }} LPA</span>
+                                </div>
+                                <a href="{% url 'drive_detail' oj.id %}" class="btn btn-secondary btn-sm">View</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar Information -->
+        <div>
+            <!-- Eligibility Criteria Summary -->
+            <div class="card" style="padding: 24px; margin-bottom: 24px;">
+                <h4 style="font-size: 1.1rem; margin-bottom: 16px;">
+                    <i class="fa-solid fa-clipboard-check" style="color: var(--primary);"></i> Eligibility Criteria
+                </h4>
+                
+                <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem;">
+                    <div>
+                        <span style="color: var(--text-muted); display: block; font-size: 0.78rem;">EXPERIENCE REQUIRED</span>
+                        <strong style="color: var(--warning);"><i class="fa-solid fa-user-clock"></i> {{ drive.get_experience_required_display }}</strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); display: block; font-size: 0.78rem;">ELIGIBLE DEPARTMENTS</span>
+                        <strong>{{ drive.eligible_departments }}</strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); display: block; font-size: 0.78rem;">ELIGIBLE BATCH / YEARS</span>
+                        <strong>Year(s) {{ drive.eligible_years }}</strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); display: block; font-size: 0.78rem;">MINIMUM CUTOFF CGPA</span>
+                        <strong style="color: var(--primary);">{{ drive.minimum_cgpa }} / 10.0</strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); display: block; font-size: 0.78rem;">ACTIVE BACKLOGS PERMITTED</span>
+                        <strong>{{ drive.max_backlogs }}</strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); display: block; font-size: 0.78rem;">TOTAL OPEN VACANCIES</span>
+                        <strong>{{ drive.vacancies }} Openings</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI JD Analyzer Recommendation Card -->
+            <div class="card" style="padding: 24px; background: linear-gradient(135deg, var(--primary-light), var(--accent-purple-light)); border: 1px solid var(--card-border-hover); margin-bottom: 24px;">
+                <div class="ai-bot-avatar" style="width: 44px; height: 44px; margin-bottom: 12px;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <h4 style="font-size: 1.1rem; color: var(--dark-navy); margin-bottom: 6px;">AI Profile Match</h4>
+                <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px;">
+                    Compare your profile skills against this job role to see your match score and tailored interview questions.
+                </p>
+                <a href="{% url 'ai_jd_analyzer' %}?job_id={{ drive.id }}" class="btn btn-ai btn-sm" style="width: 100%;">
+                    Check Profile Match %
+                </a>
+            </div>
+
+            <!-- Company Quick Profile -->
+            <div class="card" style="padding: 24px;">
+                <h4 style="font-size: 1.1rem; margin-bottom: 14px;"><i class="fa-solid fa-building" style="color: var(--secondary);"></i> Company Info</h4>
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+                    <div class="logo-box" style="width: 50px; height: 50px; margin: 0; font-size: 1.2rem;">
+                        {% if drive.company.logo %}
+                            <img src="{{ drive.company.logo.url }}" alt="{{ drive.company.name }}" style="max-height: 40px; max-width: 40px; object-fit: contain;">
+                        {% else %}
+                            {{ drive.company.name|make_list|first|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h5 style="margin: 0; font-size: 1rem;">{{ drive.company.name }}</h5>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">{{ drive.company.industry }}</span>
+                    </div>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+                    {{ drive.company.description|truncatewords:18 }}
+                </p>
+                <a href="{% url 'company_detail' drive.company.id %}" class="btn btn-secondary btn-sm" style="width: 100%;">
+                    View Full Company Profile &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

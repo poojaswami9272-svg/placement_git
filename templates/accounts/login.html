@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 440px; margin-top: 36px;">
+    <div class="card" style="padding: 32px 28px; box-shadow: var(--shadow-sm); border: 1px solid var(--card-border); border-radius: var(--radius-md);">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="width: 42px; height: 42px; margin: 0 auto 14px; border-radius: var(--radius-sm); background: var(--surface-well); border: 1px solid var(--card-border); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 style="font-size: 1.55rem; font-weight: 700; margin-bottom: 6px; color: var(--dark-navy);">Account Sign In</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Enter your credentials to access the placement portal</p>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" style="margin-bottom: 16px; padding: 10px 12px; font-size: 0.84rem;">
+                    {% for error in form.non_field_errors %}{{ error }}<br>{% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.username.id_for_label }}">
+                    Username or Email
+                </label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.username.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <label class="form-label" for="{{ form.password.id_for_label }}" style="margin-bottom: 0;">
+                        Password
+                    </label>
+                </div>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <span style="color: var(--danger); font-size: 0.8rem; display: block; margin-top: 4px;">{{ form.password.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px; padding: 10px; font-size: 0.92rem;">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In to Account
+            </button>
+        </form>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--card-border); text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+            Don't have a placement account? 
+            <a href="{% url 'register' %}" style="font-weight: 600; color: var(--primary);">Register as Student</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

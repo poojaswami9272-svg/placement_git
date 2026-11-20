@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <h2 style="font-size: 1.65rem; font-weight: 700; margin-bottom: 4px; color: var(--dark-navy);">Candidate Application Pipeline</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">Track recruitment stages, interview invitations, and status evaluations in real-time.</p>
+        </div>
+        <a href="{% url 'drive_list' %}" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-magnifying-glass"></i> Explore Active Drives
+        </a>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-file-signature"></i></div>
+            <div class="stat-info">
+                <h3>{{ total_apps }}</h3>
+                <p>Applied Drives</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-list-check"></i></div>
+            <div class="stat-info">
+                <h3>{{ shortlisted_count }}</h3>
+                <p>Shortlisted</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amber"><i class="fa-solid fa-user-clock"></i></div>
+            <div class="stat-info">
+                <h3>{{ interview_count }}</h3>
+                <p>In Interview</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-trophy"></i></div>
+            <div class="stat-info">
+                <h3>{{ selected_count }}</h3>
+                <p>Offers Disbursed</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Table Card -->
+    <div class="card" style="border: 1px solid var(--card-border);">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <h4 style="font-size: 1rem; margin: 0; font-weight: 700; color: var(--dark-navy);">Application Records</h4>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <a href="{% url 'my_applications' %}" class="btn btn-sm {% if not selected_status %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 0.78rem;">All</a>
+                <a href="?status=APPLIED" class="btn btn-sm {% if selected_status == 'APPLIED' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 0.78rem;">Applied</a>
+                <a href="?status=SHORTLISTED" class="btn btn-sm {% if selected_status == 'SHORTLISTED' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 0.78rem;">Shortlisted</a>
+                <a href="?status=TECHNICAL_INTERVIEW" class="btn btn-sm {% if selected_status == 'TECHNICAL_INTERVIEW' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 0.78rem;">Interview</a>
+                <a href="?status=SELECTED" class="btn btn-sm {% if selected_status == 'SELECTED' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 0.78rem;">Selected</a>
+            </div>
+        </div>
+
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive" style="border: none;">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Company & Role</th>
+                            <th>Package</th>
+                            <th>Applied Date</th>
+                            <th>Status</th>
+                            <th>Next Stage / Schedule</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="company-logo-avatar" style="width: 32px; height: 32px; font-size: 0.8rem; flex-shrink: 0;">
+                                            {% if app.job.company.logo %}
+                                                <img src="{{ app.job.company.logo.url }}" alt="{{ app.job.company.name }}">
+                                            {% else %}
+                                                {{ app.job.company.name|make_list|first|upper }}
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'drive_detail' app.job.id %}" style="font-weight: 600; color: var(--dark-navy); font-size: 0.88rem;">
+                                                {{ app.job.title }}
+                                            </a>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                                {{ app.job.company.name }} &bull; {{ app.job.location }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td style="font-feature-settings: 'tnum'; font-weight: 600; color: var(--dark-navy);">₹{{ app.job.salary_package }} LPA</td>
+                                <td style="color: var(--text-muted); font-size: 0.82rem;">{{ app.applied_date|date:"M d, Y" }}</td>
+
+                                <td>
+                                    <span class="badge {{ app.status_badge_class }}">
+                                        {{ app.get_status_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {% if app.interviews.all %}
+                                        {% for iv in app.interviews.all %}
+                                            <div style="font-size: 0.78rem; margin-bottom: 2px;">
+                                                <strong style="color: var(--warning);"><i class="fa-solid fa-calendar-check"></i> {{ iv.get_interview_type_display }}:</strong>
+                                                <span>{{ iv.interview_date|date:"M d" }} at {{ iv.interview_time|time:"g:i A" }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    {% elif app.status == 'SELECTED' %}
+                                        <span style="color: var(--success); font-weight: 600; font-size: 0.82rem;">
+                                            <i class="fa-solid fa-award"></i> Offer Extended
+                                        </span>
+                                    {% elif app.status == 'REJECTED' %}
+                                        <span style="color: var(--text-muted); font-size: 0.8rem;">Review Concluded</span>
+                                    {% else %}
+                                        <span style="color: var(--text-muted); font-size: 0.8rem;">Under Evaluation</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <div style="display: flex; gap: 6px;">
+                                        <a href="{% url 'drive_detail' app.job.id %}" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 0.75rem;" title="View Drive">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'ai_interview_prep' %}?job_id={{ app.job.id }}&company={{ app.job.company.name }}" class="btn btn-primary btn-sm" style="padding: 2px 7px; font-size: 0.75rem;" title="Interview Prep">
+                                            <i class="fa-solid fa-chalkboard-user"></i> Prep
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px 20px;">
+                                    <p style="font-size: 0.88rem; margin-bottom: 12px;">No applications matching this filter status.</p>
+                                    <a href="{% url 'drive_list' %}" class="btn btn-primary btn-sm">Explore Placement Drives</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

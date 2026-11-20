@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Campus Placement Announcements - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 880px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <h2 style="font-size: 1.65rem; font-weight: 700; margin-bottom: 4px; color: var(--dark-navy);">Placement Notices & Announcements</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">Official recruitment circulars, test schedules, shortlists, and placement alerts.</p>
+        </div>
+        {% if user.is_authenticated and user.is_officer %}
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('postNoticeModal').style.display='block';">
+                <i class="fa-solid fa-plus"></i> Post Announcement
+            </button>
+        {% endif %}
+    </div>
+
+    <!-- Announcements Stream -->
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+        {% for a in announcements %}
+            <div class="card" style="padding: 20px; border: 1px solid var(--card-border); {% if a.is_pinned %}border-left: 3px solid var(--primary); background: var(--surface-highlight);{% endif %}">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                            <span class="badge {% if a.category == 'DRIVE' %}badge-primary{% elif a.category == 'TEST' %}badge-warning{% elif a.category == 'DEADLINE' %}badge-danger{% elif a.category == 'INTERVIEW' %}badge-orange{% else %}badge-info{% endif %}">
+                                {{ a.get_category_display }}
+                            </span>
+                            {% if a.is_pinned %}
+                                <span class="badge badge-purple"><i class="fa-solid fa-thumbtack"></i> Pinned Notice</span>
+                            {% endif %}
+                        </div>
+                        <h3 style="font-size: 1.15rem; margin: 0; color: var(--dark-navy); font-weight: 600;">{{ a.title }}</h3>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">
+                        <i class="fa-solid fa-clock"></i> {{ a.created_at|date:"M d, Y, h:i A" }}
+                    </span>
+                </div>
+
+                <p style="color: var(--text-main); font-size: 0.9rem; line-height: 1.6; white-space: pre-line; margin-bottom: 12px;">
+                    {{ a.content }}
+                </p>
+
+                {% if a.related_job %}
+                    <div style="background: var(--surface-well); padding: 8px 12px; border-radius: var(--radius-xs); border: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;">
+                        <span>Related Drive: <strong>{{ a.related_job.title }} ({{ a.related_job.company.name }})</strong></span>
+                        <a href="{% url 'drive_detail' a.related_job.id %}" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 0.75rem;">View Drive &rarr;</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="card" style="padding: 36px; text-align: center; color: var(--text-muted);">
+                <i class="fa-solid fa-bullhorn" style="font-size: 2rem; margin-bottom: 10px; color: var(--text-light);"></i>
+                <p style="margin: 0; font-size: 0.9rem;">No placement announcements published at the moment.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal: Post Announcement (Officer Only) -->
+{% if user.is_authenticated and user.is_officer %}
+    <div id="postNoticeModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 9999; overflow-y: auto; padding: 40px 16px;">
+        <div class="card" style="max-width: 580px; margin: 40px auto; padding: 26px; border: 1px solid var(--card-border); box-shadow: var(--shadow-xl);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--card-border);">
+                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--dark-navy);">Publish Campus Notice</h3>
+                <button onclick="document.getElementById('postNoticeModal').style.display='none';" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Announcement Title *</label>
+                    {{ form.title }}
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Related Job (Optional)</label>
+                        {{ form.related_job }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notice Content *</label>
+                    {{ form.content }}
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+                    {{ form.is_pinned }}
+                    <label class="form-label" style="margin-bottom: 0; font-size: 0.85rem;">Pin this notice to top of campus notice board</label>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; border-top: 1px solid var(--card-border); padding-top: 14px;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('postNoticeModal').style.display='none';">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Publish Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

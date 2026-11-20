@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - AI College Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2 style="font-size: 1.85rem; margin: 0;">{{ title }}</h2>
+        <a href="{% url 'company_list' %}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Back to Companies
+        </a>
+    </div>
+
+    <div class="card" style="padding: 32px; border-radius: var(--radius-xl);">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" style="margin-bottom: 20px;">
+                    {% for err in form.non_field_errors %}{{ err }}<br>{% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Company Name *</label>
+                    {{ form.name }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Logo</label>
+                    {{ form.logo }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Industry *</label>
+                    {{ form.industry }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Classification *</label>
+                    {{ form.company_type }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Company Overview / Description *</label>
+                {{ form.description }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Primary Office Location</label>
+                    {{ form.location }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Website URL</label>
+                    {{ form.website }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Recruiter Contact Email</label>
+                    {{ form.contact_email }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contact Phone</label>
+                    {{ form.contact_phone }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Campus HR Name</label>
+                    {{ form.hr_name }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Average CTC Package (LPA)</label>
+                    {{ form.average_package }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Highest CTC Package (LPA)</label>
+                    {{ form.highest_package }}
+                </div>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                {{ form.is_featured }}
+                <label class="form-label" style="margin-bottom: 0;">Feature this company on home page showcase</label>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button type="submit" class="btn btn-primary" style="padding: 12px 28px;">
+                    <i class="fa-solid fa-check"></i> Save Company
+                </button>
+                <a href="{% url 'company_list' %}" class="btn btn-secondary" style="padding: 12px 24px;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

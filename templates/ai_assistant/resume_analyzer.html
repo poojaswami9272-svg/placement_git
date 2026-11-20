@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Resume Analyzer - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container" style="max-width: 920px;">
+    <!-- Minimalist Corporate Audit Header -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-file-shield" style="color: var(--primary);"></i> ATS Compliance & Keyword Benchmark
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    AI Resume ATS Audit & Optimization
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 600px;">
+                    Evaluate your resume against enterprise campus recruitment screening models. Identify detected skills, highlight missing technical keywords, and review targeted recommendations.
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'my_resume' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-file-pdf"></i> Manage Resume File
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Form Card -->
+    <div class="card" style="padding: 22px 24px; margin-bottom: 24px; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm);">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row" style="margin-bottom: 14px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Target Role / Track</label>
+                    <select name="target_role" class="form-control">
+                        <option value="Software Engineer" {% if target_role == 'Software Engineer' %}selected{% endif %}>Software Engineer / SDE</option>
+                        <option value="Python / Django Developer" {% if target_role == 'Python / Django Developer' %}selected{% endif %}>Python / Django Developer</option>
+                        <option value="Full Stack Developer" {% if target_role == 'Full Stack Developer' %}selected{% endif %}>Full Stack Developer</option>
+                        <option value="Data Analyst" {% if target_role == 'Data Analyst' %}selected{% endif %}>Data Analyst</option>
+                        <option value="Data Engineer" {% if target_role == 'Data Engineer' %}selected{% endif %}>Data Engineer</option>
+                        <option value="AI / ML Engineer" {% if target_role == 'AI / ML Engineer' %}selected{% endif %}>AI / ML Engineer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Resume Content / Summary</span>
+                    {% if student_profile %}
+                        <small style="color: var(--primary); font-weight: 600; font-size: 0.78rem;">(Leave blank to auto-scan your enrolled student profile & skills)</small>
+                    {% endif %}
+                </label>
+                <textarea name="resume_text" class="form-control" rows="5" placeholder="Paste your resume summary, project descriptions, skills list, and technical experience here...">{{ resume_text|default:'' }}</textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary" style="padding: 9px 20px;">
+                    <i class="fa-solid fa-magnifying-glass"></i> Run ATS Benchmark Audit
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Analysis Results Section -->
+    {% if analysis %}
+        <div class="card" style="padding: 24px 28px; border: 1px solid var(--card-border); box-shadow: var(--shadow-md); margin-bottom: 24px;">
+            <!-- Top Score Meter -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 20px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <span class="badge badge-primary" style="margin-bottom: 6px;">
+                        <i class="fa-solid fa-circle-check"></i> Audit Complete
+                    </span>
+                    <h3 style="font-size: 1.4rem; color: var(--dark-navy); margin: 0; font-weight: 700;">ATS Compatibility Scorecard</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 3px;">Benchmarked for {{ target_role|default:'Software Engineer' }} requirements</p>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="text-align: right;">
+                        <div style="font-size: 2.4rem; font-weight: 800; color: {% if analysis.score >= 80 %}var(--success){% elif analysis.score >= 60 %}var(--primary){% else %}var(--warning){% endif %}; line-height: 1; font-feature-settings: 'tnum';">
+                            {{ analysis.score }}<span style="font-size: 1.2rem; color: var(--text-muted); font-weight: 600;">/100</span>
+                        </div>
+                        <span style="font-size: 0.78rem; font-weight: 600; color: {% if analysis.score >= 80 %}var(--success){% else %}var(--primary){% endif %};">
+                            {% if analysis.score >= 80 %}High Match Tier{% elif analysis.score >= 60 %}Moderate Match Tier{% else %}Optimization Needed{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score Progress Bar -->
+            <div style="margin-bottom: 24px;">
+                <div class="progress-bar-container" style="height: 6px;">
+                    <div class="progress-bar-fill {% if analysis.score >= 80 %}success{% elif analysis.score < 60 %}warning{% endif %}" style="width: {{ analysis.score }}%;"></div>
+                </div>
+            </div>
+
+            <!-- Skills Found vs Missing Skills Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <!-- Found Skills -->
+                <div style="background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--success); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-circle-check"></i> Detected Keywords ({{ analysis.skills_found|length }})
+                        </span>
+                    </div>
+                    <div class="job-skills-wrap" style="margin-bottom: 0;">
+                        {% for s in analysis.skills_found %}
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-check" style="font-size: 0.65rem;"></i> {{ s }}
+                            </span>
+                        {% empty %}
+                            <p style="color: var(--text-muted); font-size: 0.82rem; margin: 0;">No high-frequency target keywords detected in the submitted text.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Missing Skills -->
+                <div style="background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--warning); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Identified Gaps ({{ analysis.missing_skills|length }})
+                        </span>
+                    </div>
+                    <div class="job-skills-wrap" style="margin-bottom: 0;">
+                        {% for s in analysis.missing_skills %}
+                            <span class="badge badge-warning">
+                                <i class="fa-solid fa-plus" style="font-size: 0.65rem;"></i> {{ s }}
+                            </span>
+                        {% empty %}
+                            <p style="color: var(--success); font-size: 0.82rem; margin: 0;">All high-value core keywords identified!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tailored Recommendations -->
+            <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--dark-navy); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Actionable Audit Recommendations
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% for rec in analysis.recommendations %}
+                        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; background: var(--surface-highlight); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.86rem; color: var(--text-main);">
+                            <i class="fa-solid fa-angle-right" style="color: var(--primary); margin-top: 3px; font-size: 0.8rem;"></i>
+                            <span>{{ rec }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; border-top: 1px solid var(--card-border); padding-top: 16px;">
+                <a href="{% url 'my_resume' %}" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-upload"></i> Update Placement Resume
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

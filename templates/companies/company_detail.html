@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.name }} - Placement Partner Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Company Header Banner Card -->
+    <div class="card" style="padding: 36px; margin-bottom: 30px; border-radius: var(--radius-xl); background: var(--card-bg);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 24px;">
+            <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+                <div class="logo-box" style="width: 88px; height: 88px; margin: 0; font-size: 2.2rem; border-radius: var(--radius-lg); background: var(--card-bg-solid); box-shadow: var(--shadow-md);">
+                    {% if company.logo %}
+                        <img src="{{ company.logo.url }}" alt="{{ company.name }}" style="max-height: 70px; max-width: 70px; object-fit: contain;">
+                    {% else %}
+                        {{ company.name|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
+                        <h1 style="font-size: 2rem; margin: 0;">{{ company.name }}</h1>
+                        <span class="badge badge-primary" style="font-size: 0.85rem;">{{ company.get_company_type_display }}</span>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--text-muted); display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px;">
+                        <span><i class="fa-solid fa-industry" style="color: var(--primary);"></i> {{ company.industry }}</span>
+                        <span><i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> {{ company.location }}</span>
+                        {% if company.website %}
+                            <a href="{{ company.website }}" target="_blank"><i class="fa-solid fa-globe"></i> Visit Website &rarr;</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Officer Controls -->
+            {% if user.is_authenticated and user.is_officer %}
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="{% url 'drive_create' %}?company={{ company.id }}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-plus"></i> Post Job Drive
+                    </a>
+                    <a href="{% url 'company_edit' company.id %}" class="btn btn-secondary btn-sm">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </a>
+                    <a href="{% url 'company_delete' company.id %}" class="btn btn-danger btn-sm">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Metrics Row -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--card-border);">
+            <div style="background: var(--surface-highlight); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Average Package</span>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-top: 4px;">₹{{ company.average_package }} LPA</div>
+            </div>
+            <div style="background: var(--surface-highlight); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Highest Package</span>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--success); margin-top: 4px;">₹{{ company.highest_package }} LPA</div>
+            </div>
+            <div style="background: var(--surface-highlight); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Placement Drives</span>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--dark-navy); margin-top: 4px;">{{ company.placement_drives.count }}</div>
+            </div>
+            <div style="background: var(--surface-highlight); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border);">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Students Selected</span>
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-purple); margin-top: 4px;">{{ total_selected }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Description & Jobs Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        <div>
+            <!-- About Company -->
+            <div class="card" style="padding: 28px; margin-bottom: 30px;">
+                <h3 style="font-size: 1.3rem; margin-bottom: 14px; color: var(--dark-navy);">About {{ company.name }}</h3>
+                <p style="color: var(--text-main); font-size: 0.98rem; line-height: 1.8; white-space: pre-line;">
+                    {{ company.description }}
+                </p>
+            </div>
+
+            <!-- Open Placement Drives -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="font-size: 1.35rem; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-briefcase" style="color: var(--primary);"></i> Current Openings ({{ open_jobs.count }})
+                </h3>
+
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    {% for job in open_jobs %}
+                        <div class="job-card" style="padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+                                <div>
+                                    <h4 style="font-size: 1.15rem; margin-bottom: 4px;">
+                                        <a href="{% url 'drive_detail' job.id %}">{{ job.title }}</a>
+                                    </h4>
+                                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                                        <i class="fa-solid fa-location-dot"></i> {{ job.location }} &bull; 
+                                        <i class="fa-solid fa-clock"></i> {{ job.get_job_type_display }} &bull; 
+                                        Deadline: <strong style="color: var(--danger);">{{ job.application_deadline }}</strong>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">₹{{ job.salary_package }} LPA</div>
+                                    <span style="font-size: 0.78rem; color: var(--text-muted);">Min CGPA: {{ job.minimum_cgpa }}</span>
+                                </div>
+                            </div>
+
+                            <div class="job-skills-wrap" style="margin: 14px 0;">
+                                {% for s in job.skills_list|slice:":4" %}
+                                    <span class="skill-tag">{{ s }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--card-border); padding-top: 12px;">
+                                <a href="{% url 'drive_detail' job.id %}" class="btn btn-primary btn-sm">
+                                    View Details & Apply &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="card" style="padding: 30px; text-align: center; color: var(--text-muted);">
+                            No active placement drives currently open for {{ company.name }}.
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Past Drives History -->
+            {% if past_drives %}
+                <div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 14px; color: var(--text-muted);">Past Placement Drives</h3>
+                    <div class="card" style="padding: 0;">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Role Title</th>
+                                    <th>Package</th>
+                                    <th>Drive Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pd in past_drives %}
+                                    <tr>
+                                        <td><strong>{{ pd.title }}</strong></td>
+                                        <td>₹{{ pd.salary_package }} LPA</td>
+                                        <td>{{ pd.drive_date }}</td>
+                                        <td><span class="badge badge-secondary">Concluded</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Side: Recruitment Contact & Information -->
+        <div>
+            <div class="card" style="padding: 24px; margin-bottom: 24px;">
+                <h4 style="font-size: 1.1rem; margin-bottom: 14px;"><i class="fa-solid fa-address-card" style="color: var(--primary);"></i> Campus Contact</h4>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem;">
+                    <div>
+                        <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">HR / CAMPUS LEAD</span>
+                        <strong>{{ company.hr_name|default:'University Recruiting Team' }}</strong>
+                    </div>
+                    {% if company.contact_email %}
+                        <div>
+                            <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">EMAIL</span>
+                            <a href="mailto:{{ company.contact_email }}">{{ company.contact_email }}</a>
+                        </div>
+                    {% endif %}
+                    {% if company.contact_phone %}
+                        <div>
+                            <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">PHONE</span>
+                            <span>{{ company.contact_phone }}</span>
+                        </div>
+                    {% endif %}
+                    {% if company.website %}
+                        <div style="margin-top: 10px;">
+                            <a href="{{ company.website }}" target="_blank" class="btn btn-secondary btn-sm" style="width: 100%;">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Official Site
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- AI Prep Recommendation for this Company -->
+            <div class="card" style="padding: 24px; background: linear-gradient(135deg, #f5f3ff, #ede9fe); border-color: #ddd6fe;">
+                <div class="ai-bot-avatar" style="width: 44px; height: 44px; margin-bottom: 12px;">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <h4 style="font-size: 1.1rem; color: var(--dark-navy); margin-bottom: 8px;">Targeting {{ company.name }}?</h4>
+                <p style="color: #6d28d9; font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px;">
+                    Practice company-specific technical rounds, aptitude tests, and HR questions using our AI Interview Preparation tool.
+                </p>
+                <a href="{% url 'ai_interview_prep' %}?company={{ company.name }}" class="btn btn-ai btn-sm" style="width: 100%;">
+                    Start AI Prep for {{ company.name }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

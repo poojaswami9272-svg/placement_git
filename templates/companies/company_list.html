@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Partner Companies - AI College Placement Management System{% endblock %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Minimalist Corporate Header -->
+    <div class="card" style="margin-bottom: 20px; padding: 22px 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.74rem; font-weight: 600; color: var(--dark-navy); margin-bottom: 8px;">
+                    <i class="fa-solid fa-handshake" style="color: var(--primary);"></i> Corporate Recruiter Directory
+                </div>
+                <h2 style="font-size: 1.65rem; font-weight: 700; color: var(--dark-navy); margin: 0 0 4px 0;">
+                    Recruiting Partners & Enterprises
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 620px;">
+                    Over 150+ technology leaders, global consulting enterprises, and industry leaders conducting annual campus placement drives.
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                {% if user.is_authenticated and user.is_officer %}
+                    <a href="{% url 'company_create' %}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-plus"></i> Register New Recruiter
+                    </a>
+                {% endif %}
+                <a href="{% url 'drive_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-briefcase"></i> View All Drives
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="filter-card">
+        <form method="get" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0; flex: 2; min-width: 220px;">
+                <label class="form-label" style="font-size: 0.8rem;">Search Company / Industry / City</label>
+                <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="e.g. TCS, Microsoft, Cloud, Bangalore...">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 180px;">
+                <label class="form-label" style="font-size: 0.8rem;">Company Classification</label>
+                <select name="type" class="form-control">
+                    <option value="">All Classifications</option>
+                    <option value="PRODUCT" {% if selected_type == 'PRODUCT' %}selected{% endif %}>Product Based</option>
+                    <option value="SERVICE" {% if selected_type == 'SERVICE' %}selected{% endif %}>Service Based</option>
+                    <option value="STARTUP" {% if selected_type == 'STARTUP' %}selected{% endif %}>Startup</option>
+                    <option value="MNC" {% if selected_type == 'MNC' %}selected{% endif %}>Multinational Corp (MNC)</option>
+                    <option value="FINTECH" {% if selected_type == 'FINTECH' %}selected{% endif %}>FinTech / Banking</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="height: 38px;">
+                <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+            {% if q or selected_type %}
+                <a href="{% url 'company_list' %}" class="btn btn-secondary" style="height: 38px; display: inline-flex; align-items: center;">Reset</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Companies Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; margin-top: 20px;">
+        {% for company in page_obj %}
+            <div class="company-card" style="display: flex; flex-direction: column; justify-content: space-between; text-align: left;">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <div class="logo-box" style="margin: 0; width: 44px; height: 44px; font-size: 1.1rem;">
+                            {% if company.logo %}
+                                <img src="{{ company.logo.url }}" alt="{{ company.name }}" style="max-height: 36px; max-width: 36px; object-fit: contain;">
+                            {% else %}
+                                {{ company.name|make_list|first|upper }}
+                            {% endif %}
+                        </div>
+                        <span class="badge badge-secondary">{{ company.get_company_type_display }}</span>
+                    </div>
+
+                    <h3 style="font-size: 1.15rem; margin-bottom: 3px; color: var(--dark-navy); font-weight: 700;">
+                        <a href="{% url 'company_detail' company.id %}" style="color: var(--dark-navy);">{{ company.name }}</a>
+                    </h3>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">
+                        {{ company.industry }} &bull; {{ company.location }}
+                    </div>
+
+                    <p style="font-size: 0.85rem; color: var(--text-main); line-height: 1.5; margin-bottom: 14px;">
+                        {{ company.description|truncatewords:18 }}
+                    </p>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: var(--surface-well); border: 1px solid var(--card-border); border-radius: var(--radius-xs); font-size: 0.82rem; margin-bottom: 12px;">
+                        <div>
+                            <span style="color: var(--text-muted); display: block; font-size: 0.72rem;">AVG CTC</span>
+                            <strong style="color: var(--dark-navy); font-feature-settings: 'tnum';">₹{{ company.average_package }} LPA</strong>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="color: var(--text-muted); display: block; font-size: 0.72rem;">HIGHEST CTC</span>
+                            <strong style="color: var(--success); font-feature-settings: 'tnum';">₹{{ company.highest_package }} LPA</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 10px;">
+                        <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted);">
+                            <i class="fa-solid fa-briefcase"></i> {{ company.placement_drives.count }} Active Drives
+                        </span>
+                        <a href="{% url 'company_detail' company.id %}" class="btn btn-secondary btn-sm" style="font-size: 0.78rem;">
+                            Profile & Jobs &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px;" class="card">
+                <i class="fa-solid fa-building-circle-xmark" style="font-size: 2.4rem; color: var(--text-light); margin-bottom: 12px;"></i>
+                <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">No companies found</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">Try adjusting your search criteria or register a new company.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: center; gap: 6px; margin-top: 32px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&type={{ selected_type }}" class="btn btn-secondary btn-sm">&laquo; Previous</a>
+            {% endif %}
+            <span class="btn btn-secondary btn-sm" style="cursor: default; background: var(--surface-well); color: var(--dark-navy); font-weight: 600;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&type={{ selected_type }}" class="btn btn-secondary btn-sm">Next &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

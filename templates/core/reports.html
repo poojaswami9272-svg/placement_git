@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports & Exports - Placement Office{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 960px;">
+    <div style="margin-bottom: 28px;">
+        <span class="badge badge-purple" style="margin-bottom: 8px;">Placement Office Administration</span>
+        <h2 style="font-size: 2rem; color: var(--dark-navy); margin-bottom: 4px;">Placement Reports & Data Exports</h2>
+        <p style="color: var(--text-muted); font-size: 0.98rem;">Generate official accreditation reports, company visit records, and candidate dossiers in PDF and Excel formats.</p>
+    </div>
+
+    <!-- Reports Grid Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+        <!-- Card 1: Student Placement Report -->
+        <div class="card" style="padding: 28px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px;">
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+                <h4 style="font-size: 1.2rem; color: var(--dark-navy); margin-bottom: 8px;">Student Placement Report</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
+                    Complete roster of all registered students including Roll Numbers, branch, CGPA, backlogs, key skills, and current placement status.
+                </p>
+            </div>
+            <a href="{% url 'export_students_excel' %}" class="btn btn-primary btn-sm" style="width: 100%;">
+                <i class="fa-solid fa-download"></i> Export to Excel (.XLSX)
+            </a>
+        </div>
+
+        <!-- Card 2: Company Recruitment Report -->
+        <div class="card" style="padding: 28px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--secondary-light); color: var(--secondary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px;">
+                    <i class="fa-solid fa-building-circle-arrow-right"></i>
+                </div>
+                <h4 style="font-size: 1.2rem; color: var(--dark-navy); margin-bottom: 8px;">Company Hiring Summary</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
+                    Detailed list of visiting corporate partners, classification, locations, average and highest CTC packages, and contact details.
+                </p>
+            </div>
+            <a href="{% url 'export_companies_excel' %}" class="btn btn-secondary btn-sm" style="width: 100%;">
+                <i class="fa-solid fa-download"></i> Export Companies (.XLSX)
+            </a>
+        </div>
+
+        <!-- Card 3: Official Placement PDF Summary -->
+        <div class="card" style="padding: 28px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: #fee2e2; color: var(--danger); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px;">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <h4 style="font-size: 1.2rem; color: var(--dark-navy); margin-bottom: 8px;">Official Placement PDF Dossier</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
+                    Formal printable document with candidate-job mappings, verified offers, and selection statuses formatted with collegiate headers.
+                </p>
+            </div>
+            <a href="{% url 'export_placements_pdf' %}" class="btn btn-danger btn-sm" style="width: 100%;">
+                <i class="fa-solid fa-file-pdf"></i> Download Official PDF
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

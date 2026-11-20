@@ -1,0 +1,371 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI College Placement Management System{% endblock %}</title>
+    <meta name="description" content="AI College Placement Management System - Discover opportunities, check eligibility, practice interviews, analyze resumes, and accelerate campus placements.">
+    <meta name="keywords" content="college placements, campus jobs, campus recruitment, AI career assistant, resume analyzer, placement management system">
+
+    <!-- Google Fonts: Inter (Body & Data) & Plus Jakarta Sans (Headings) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Chart.js for Dashboards & Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom Style with cache busting -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3.0">
+    
+    <!-- Inline styles to guarantee horizontal navbar layout without bullets -->
+    <style>
+        .navbar .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            width: 100%;
+        }
+        #navLinks,
+        .nav-links {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 24px !important;
+            list-style: none !important;
+            list-style-type: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            align-items: center !important;
+            margin-left: auto !important;
+        }
+        #navLinks li,
+        .nav-links li,
+        .nav-item {
+            list-style: none !important;
+            list-style-type: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 20px;
+        }
+        @media (max-width: 768px) {
+            #navLinks,
+            .nav-links {
+                display: none !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+                margin-left: 0 !important;
+            }
+            #navLinks.active,
+            .nav-links.active {
+                display: flex !important;
+            }
+        }
+    </style>
+
+    <!-- Immediate Theme Initialization to Prevent Flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Main Navigation Bar -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="{% url 'home' %}" class="brand-logo" id="brandLogo">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <span>Placement<span class="highlight">AI</span></span>
+            </a>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <!-- Nav Links (Horizontal, Gap 24px, No Bullets, Top Right Corner) -->
+            <ul class="nav-links" id="navLinks" style="display: flex; flex-direction: row; gap: 24px; list-style: none; margin: 0; padding: 0; align-items: center; margin-left: auto;">
+                <li class="nav-item" style="list-style: none;">
+                    <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <i class="fa-solid fa-house"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item" style="list-style: none;">
+                    <a href="{% url 'drive_list' %}" class="{% if 'drive' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fa-solid fa-briefcase"></i> Drives
+                    </a>
+                </li>
+                <li class="nav-item" style="list-style: none;">
+                    <a href="{% url 'company_list' %}" class="{% if 'company' in request.resolver_match.url_name %}active{% endif %}">
+                        <i class="fa-solid fa-building"></i> Companies
+                    </a>
+                </li>
+
+                {% if user.is_authenticated %}
+                    {% if user.is_student %}
+                        <!-- Student Specific Navigation -->
+                        <li class="nav-item" style="list-style: none;">
+                            <a href="{% url 'my_applications' %}" class="{% if request.resolver_match.url_name == 'my_applications' %}active{% endif %}">
+                                <i class="fa-solid fa-file-signature"></i> Applications
+                            </a>
+                        </li>
+                        <li class="nav-item" style="list-style: none;">
+                            <a href="{% url 'my_resume' %}" class="{% if request.resolver_match.url_name == 'my_resume' %}active{% endif %}">
+                                <i class="fa-solid fa-file-pdf"></i> Resume
+                            </a>
+                        </li>
+                        <li class="nav-item" style="list-style: none;">
+                            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                                <i class="fa-solid fa-chart-line"></i> Dashboard
+                            </a>
+                        </li>
+                    {% elif user.is_officer %}
+                        <!-- Placement Officer / Admin Specific Navigation -->
+                        <li class="nav-item" style="list-style: none;">
+                            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                                <i class="fa-solid fa-gauge-high"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item" style="list-style: none;">
+                            <a href="{% url 'student_list' %}" class="{% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+                                <i class="fa-solid fa-user-graduate"></i> Students
+                            </a>
+                        </li>
+                        <li class="nav-item" style="list-style: none;">
+                            <a href="{% url 'officer_applications' %}" class="{% if request.resolver_match.url_name == 'officer_applications' %}active{% endif %}">
+                                <i class="fa-solid fa-clipboard-check"></i> Applications
+                            </a>
+                        </li>
+                        <li class="nav-item" style="list-style: none;">
+                            <a href="{% url 'reports' %}" class="{% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
+                                <i class="fa-solid fa-chart-pie"></i> Reports
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <!-- AI Assistant Accessible to authenticated & guests -->
+                    <li class="nav-item" style="list-style: none;">
+                        <a href="{% url 'ai_assistant' %}" class="{% if 'ai_' in request.resolver_match.url_name %}active{% endif %}" style="color: var(--accent-purple); font-weight: 600;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant
+                        </a>
+                    </li>
+
+                    <li class="nav-item" style="list-style: none;">
+                        <a href="{% url 'calendar' %}" class="{% if request.resolver_match.url_name == 'calendar' %}active{% endif %}">
+                            <i class="fa-solid fa-calendar-days"></i> Calendar
+                        </a>
+                    </li>
+                {% else %}
+                    <!-- Public Guest Navigation -->
+                    <li class="nav-item" style="list-style: none;">
+                        <a href="{% url 'placement_statistics' %}" class="{% if request.resolver_match.url_name == 'placement_statistics' %}active{% endif %}">
+                            <i class="fa-solid fa-chart-column"></i> Statistics
+                        </a>
+                    </li>
+                    <li class="nav-item" style="list-style: none;">
+                        <a href="{% url 'ai_assistant' %}" style="color: var(--accent-purple); font-weight: 600;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant
+                        </a>
+                    </li>
+                    <li class="nav-item" style="list-style: none;">
+                        <a href="{% url 'contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+                            <i class="fa-solid fa-envelope"></i> Contact
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <!-- Navigation Actions & Profile -->
+            <div class="nav-actions">
+                <!-- Theme Mode Switcher (Dark / Light) -->
+                <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle dark/light theme" title="Toggle theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                {% if user.is_authenticated %}
+                    <!-- Notification Bell with Count -->
+                    <a href="{% url 'notifications' %}" class="btn btn-secondary btn-sm" style="position: relative; padding: 6px 10px;" title="Notifications">
+                        <i class="fa-solid fa-bell"></i>
+                        {% if unread_notification_count > 0 %}
+                            <span class="nav-badge-pill" style="position: absolute; top: -5px; right: -5px;">
+                                {{ unread_notification_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+                    <!-- User Menu Dropdown -->
+                    <div class="user-menu-wrapper">
+                        <button class="user-avatar-btn" id="userMenuBtn">
+                            <div class="avatar-circle">
+                                {% if user.is_student and user.student_profile.profile_photo %}
+                                    <img src="{{ user.student_profile.profile_photo.url }}" alt="{{ user.first_name }}">
+                                {% elif user.is_officer %}
+                                    <img src="{% static 'images/officer_portrait.jpg' %}" alt="{{ user.first_name }}">
+                                {% elif user.is_student and 'priya' in user.username|lower %}
+                                    <img src="{% static 'images/student_female.jpg' %}" alt="{{ user.first_name }}">
+                                {% elif user.is_student %}
+                                    <img src="{% static 'images/student_male.jpg' %}" alt="{{ user.first_name }}">
+                                {% else %}
+                                    {{ user.first_name|default:user.username|make_list|first|upper }}
+                                {% endif %}
+                            </div>
+                            <span>{{ user.first_name|default:user.username }}</span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: var(--text-muted);"></i>
+                        </button>
+
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-header">
+                                <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="role">{{ user.get_user_type_display }}</div>
+                            </div>
+                            <a href="{% url 'dashboard' %}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                            {% if user.is_student %}
+                                <a href="{% url 'student_profile' %}"><i class="fa-solid fa-id-card"></i> My Profile</a>
+                                <a href="{% url 'my_resume' %}"><i class="fa-solid fa-file-lines"></i> Resume Manager</a>
+                                <a href="{% url 'my_applications' %}"><i class="fa-solid fa-briefcase"></i> My Applications</a>
+                            {% else %}
+                                <a href="{% url 'admin:index' %}"><i class="fa-solid fa-sliders"></i> Django Admin</a>
+                            {% endif %}
+                            <a href="{% url 'announcements' %}"><i class="fa-solid fa-bullhorn"></i> Announcements</a>
+                            <div style="height: 1px; background: var(--card-border); margin: 3px 0;"></div>
+                            <form action="{% url 'logout' %}" method="post" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="logout-item" style="color: var(--danger);">
+                                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Sign In & Register Buttons -->
+                    <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">
+                        <i class="fa-solid fa-right-to-bracket"></i> Login
+                    </a>
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-user-plus"></i> Register
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Django Messages Container -->
+    {% if messages %}
+        <div class="django-message-wrapper" id="djangoMessages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        {% if message.tags == 'success' %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-info"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                    <button class="close-btn" aria-label="Close">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Dynamic Content Block -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Minimalist Corporate Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>
+                        <div class="brand-icon" style="width: 26px; height: 26px; font-size: 0.85rem; display: inline-flex; border-radius: 4px; background: #ffffff; color: #0f172a; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        PlacementAI
+                    </h3>
+                    <p>
+                        Institutional placement management platform providing AI-driven opportunity discovery, automated eligibility audits, and comprehensive candidate preparation.
+                    </p>
+                    <div style="margin-top: 14px; display: flex; gap: 8px;">
+                        <a href="#" class="btn btn-secondary btn-sm" style="width: 32px; height: 32px; padding: 0; border-radius: 4px; color: #94a3b8; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" class="btn btn-secondary btn-sm" style="width: 32px; height: 32px; padding: 0; border-radius: 4px; color: #94a3b8; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="btn btn-secondary btn-sm" style="width: 32px; height: 32px; padding: 0; border-radius: 4px; color: #94a3b8; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);"><i class="fa-brands fa-github"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'drive_list' %}">Campus Drives</a></li>
+                        <li><a href="{% url 'company_list' %}">Recruiter Directory</a></li>
+                        <li><a href="{% url 'placement_statistics' %}">Placement Statistics</a></li>
+                        <li><a href="{% url 'calendar' %}">Drive Calendar</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>AI Capabilities</h4>
+                    <ul>
+                        <li><a href="{% url 'ai_assistant' %}">Career Assistant</a></li>
+                        <li><a href="{% url 'ai_resume_analyzer' %}">Resume ATS Audit</a></li>
+                        <li><a href="{% url 'ai_jd_analyzer' %}">Job Description Matcher</a></li>
+                        <li><a href="{% url 'ai_interview_prep' %}">Mock Interview Prep</a></li>
+                        <li><a href="{% url 'ai_career_roadmap' %}">Competency Roadmaps</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Corporate Relations</h4>
+                    <p style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 6px;">
+                        <i class="fa-solid fa-location-dot" style="margin-right: 6px;"></i> Placement Directorate, Level 3
+                    </p>
+                    <p style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 6px;">
+                        <i class="fa-solid fa-envelope" style="margin-right: 6px;"></i> placements@college.edu
+                    </p>
+                    <p style="font-size: 0.82rem; color: #94a3b8;">
+                        <i class="fa-solid fa-phone" style="margin-right: 6px;"></i> +91 (080) 2854-9900
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>
+                    &copy; 2026 AI College Placement Management System. Enterprise Edition.
+                </div>
+                <div style="display: flex; gap: 16px;">
+                    <a href="{% url 'contact' %}" style="color: #64748b;">Contact Placement Cell</a>
+                    <a href="#" style="color: #64748b;">Privacy Notice</a>
+                    <a href="#" style="color: #64748b;">Institutional Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Main JavaScript File -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
